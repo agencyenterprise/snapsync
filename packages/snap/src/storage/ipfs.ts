@@ -1,7 +1,19 @@
-export const encrypt = async () => {
-  //
-};
+import NetworkAbstract from '../networks/NetworkAbstract';
 
-export const decrypt = async () => {
-  return {};
-};
+class IPFS {
+  private network: NetworkAbstract;
+
+  constructor(network: NetworkAbstract) {
+    this.network = network;
+  }
+
+  encrypt() {
+    //
+  }
+
+  decrypt() {
+    //
+  }
+}
+
+export default IPFS;
