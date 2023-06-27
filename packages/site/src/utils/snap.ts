@@ -80,4 +80,24 @@ export const sendClearState = async () => {
   });
 };
 
+export const encrypt = async (data: Record<string, unknown>) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'encrypt', params: [data] },
+    },
+  });
+};
+
+export const dencrypt = async (encryptedData: string) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'decrypt', params: [encryptedData] },
+    },
+  });
+};
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
