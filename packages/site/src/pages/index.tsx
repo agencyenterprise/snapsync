@@ -1,21 +1,22 @@
 import { useContext } from 'react';
 import styled from 'styled-components';
+import {
+  Card,
+  ConnectButton,
+  InstallFlaskButton,
+  ReconnectButton,
+  SendMessageButton,
+} from '../components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
+  encrypt,
   getSnap,
   sendClearState,
   sendGetState,
   sendSaveState,
   shouldDisplayReconnectButton,
 } from '../utils';
-import {
-  ConnectButton,
-  InstallFlaskButton,
-  ReconnectButton,
-  SendMessageButton,
-  Card,
-} from '../components';
 
 const Container = styled.div`
   display: flex;
@@ -149,6 +150,16 @@ const Index = () => {
     }
   };
 
+  const handleEncryptClick = async () => {
+    try {
+      await encrypt({ foo: 'bar' });
+      console.log('data encrypted');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -253,6 +264,24 @@ const Index = () => {
             button: (
               <SendMessageButton
                 onClick={handleClearState}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Encrypyt Data',
+            description: 'Encrypt data using the snap.',
+            button: (
+              <SendMessageButton
+                onClick={handleEncryptClick}
                 disabled={!state.installedSnap}
               />
             ),
