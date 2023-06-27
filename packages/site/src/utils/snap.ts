@@ -100,4 +100,24 @@ export const dencrypt = async (encryptedData: string) => {
   });
 };
 
+export const uploadToIPFS = async (encryptedData: string) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'uploadToIPFS', params: [encryptedData] },
+    },
+  });
+};
+
+export const downloadFromIPFS = async (cid: string) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'downloadFromIPFS', params: [cid] },
+    },
+  });
+};
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

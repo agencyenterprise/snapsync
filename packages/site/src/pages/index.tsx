@@ -11,12 +11,14 @@ import { MetaMaskContext, MetamaskActions } from '../hooks';
 import {
   connectSnap,
   dencrypt,
+  downloadFromIPFS,
   encrypt,
   getSnap,
   sendClearState,
   sendGetState,
   sendSaveState,
   shouldDisplayReconnectButton,
+  uploadToIPFS,
 } from '../utils';
 
 const Container = styled.div`
@@ -105,7 +107,8 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-  const [encrypted, setEncrypted] = useState('');
+  const [toIPFS, setToIPFS] = useState('');
+  const [fromIPFS, setFromIPFS] = useState('');
   const [toEncrypt, setToEncrypt] = useState('');
   const [toDecrypt, setToDecrypt] = useState('');
 
@@ -172,6 +175,26 @@ const Index = () => {
     }
   };
 
+  const handleUploadString = async () => {
+    try {
+      await uploadToIPFS(toIPFS);
+      console.log('data uploaded');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleDownloadString = async () => {
+    try {
+      await downloadFromIPFS(fromIPFS);
+      console.log('data downloaded');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -230,7 +253,7 @@ const Index = () => {
           />
         )}
 
-        <Card
+        {/* <Card
           content={{
             title: 'Send handleSaveState Message',
             description:
@@ -286,17 +309,16 @@ const Index = () => {
             Boolean(state.installedSnap) &&
             !shouldDisplayReconnectButton(state.installedSnap)
           }
-        />
+        /> */}
         <Card
           content={{
-            title: 'Encrypyt Data',
+            title: 'Encrypt Data',
             description: (
               <div>
                 <p>Encrypt data using the snap.</p>
                 <input
                   type="text"
-                  id="encrypt"
-                  name="encrypt"
+                  placeholder="String to encrypt"
                   defaultValue={toEncrypt}
                   onChange={(e) => {
                     setToEncrypt(e.target.value);
@@ -320,14 +342,13 @@ const Index = () => {
         />
         <Card
           content={{
-            title: 'Encrypyt Data',
+            title: 'Decrypt Data',
             description: (
               <div>
-                <p>Decrypt data using the snap.</p>
+                <p>Decrypt string</p>
                 <input
                   type="text"
-                  id="encrypt"
-                  name="encrypt"
+                  placeholder="String to decrypt"
                   defaultValue={toDecrypt}
                   onChange={(e) => {
                     setToDecrypt(e.target.value);
@@ -338,6 +359,66 @@ const Index = () => {
             button: (
               <SendMessageButton
                 onClick={handleDencryptClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Upload to IPFS',
+            description: (
+              <div>
+                <p>Upload string to IPFS and returns the CID</p>
+                <input
+                  type="text"
+                  placeholder="String to upload to IPFS"
+                  defaultValue={toIPFS}
+                  onChange={(e) => {
+                    setToIPFS(e.target.value);
+                  }}
+                />
+              </div>
+            ),
+            button: (
+              <SendMessageButton
+                onClick={handleUploadString}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Download from IPFS',
+            description: (
+              <div>
+                <p>Get encrypted string from IPFS using the CID</p>
+                <input
+                  type="text"
+                  placeholder="CID"
+                  defaultValue={fromIPFS}
+                  onChange={(e) => {
+                    setFromIPFS(e.target.value);
+                  }}
+                />
+              </div>
+            ),
+            button: (
+              <SendMessageButton
+                onClick={handleDownloadString}
                 disabled={!state.installedSnap}
               />
             ),

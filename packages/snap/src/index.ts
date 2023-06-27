@@ -2,6 +2,7 @@ import { Json, OnRpcRequestHandler } from '@metamask/snaps-types';
 import { panel, text } from '@metamask/snaps-ui';
 import { decryptData, encryptData } from './encryption';
 import { getState, saveState } from './storage';
+import { downloadFromIPFSStorage, uploadToIPFSStorage } from './storage/ipfs';
 import { clearLocalState } from './storage/local';
 
 /**
@@ -25,6 +26,31 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
     case 'clearState':
       return clearLocalState();
+
+    case 'uploadToIPFS':
+      return uploadToIPFSStorage(request.params[0] as string).then(
+        (cid: string) => {
+          return snap.request({
+            method: 'snap_dialog',
+            params: {
+              type: 'alert',
+              content: panel([text(`Uploaded! CID: **${cid}**`)]),
+            },
+          });
+        },
+      );
+    case 'downloadFromIPFS':
+      return downloadFromIPFSStorage(request.params[0] as string).then(
+        (data: string) => {
+          return snap.request({
+            method: 'snap_dialog',
+            params: {
+              type: 'alert',
+              content: panel([text(`Downloading from IPFS: **${data}**`)]),
+            },
+          });
+        },
+      );
 
     case 'encrypt':
       return encryptData(request.params).then((encrypted) => {
