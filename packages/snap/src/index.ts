@@ -1,4 +1,4 @@
-import { OnRpcRequestHandler } from '@metamask/snaps-types';
+import { Json, OnRpcRequestHandler } from '@metamask/snaps-types';
 import { panel, text } from '@metamask/snaps-ui';
 import { decryptData, encryptData } from './encryption';
 import { getState, saveState } from './storage';
@@ -40,15 +40,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
         });
       });
     case 'decrypt':
-      const [encrypted] = request.params;
-      return decryptData(encrypted).then((decrypted) => {
+      const [encrypted] = request.params as Json[];
+      return decryptData(encrypted as string).then((decrypted) => {
         return snap.request({
           method: 'snap_dialog',
           params: {
             type: 'alert',
             content: panel([
               text(`Decrypting message: **${encrypted}**`),
-              text(`Decrypted message: **${decrypted}**`),
+              text(`Decrypted message: **${JSON.stringify(decrypted)}**`),
             ]),
           },
         });

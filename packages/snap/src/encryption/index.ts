@@ -1,6 +1,24 @@
-import { getBIP44AddressKeyDeriver } from '@metamask/key-tree';
+import { BIP44Node, getBIP44AddressKeyDeriver } from '@metamask/key-tree';
 import { Json } from '@metamask/snaps-types';
 import { decrypt, encrypt } from 'eciesjs';
+
+/**
+ * Get derived account from the MetaMask wallet.
+ *
+ * @param coinType - The coin type to use.
+ * @returns The derived account from the MetaMask wallet.
+ */
+export async function getDerivedAccount(coinType = 3): Promise<BIP44Node> {
+  const coinNode = await snap.request({
+    method: 'snap_getBip44Entropy',
+    params: {
+      coinType,
+    },
+  });
+  const deriveAccount = await getBIP44AddressKeyDeriver(coinNode);
+  const derivedAccount = await deriveAccount(1);
+  return derivedAccount;
+}
 
 /**
  * Get the private key for the second account in the MetaMask wallet.
@@ -9,15 +27,8 @@ import { decrypt, encrypt } from 'eciesjs';
  * @throws If the private key is not found.
  */
 export async function getPrivateKey() {
-  const dogecoinNode = await snap.request({
-    method: 'snap_getBip44Entropy',
-    params: {
-      coinType: 3,
-    },
-  });
-  const deriveDogecoinAddress = await getBIP44AddressKeyDeriver(dogecoinNode);
-  const secondAccount = await deriveDogecoinAddress(1);
-  const { privateKey } = secondAccount;
+  const derivedAccount = await getDerivedAccount();
+  const { privateKey } = derivedAccount;
   if (!privateKey) {
     throw new Error('Private key not found');
   }
@@ -30,15 +41,8 @@ export async function getPrivateKey() {
  * @returns The public key for the second account in the MetaMask wallet.
  */
 export async function getPublicKey() {
-  const dogecoinNode = await snap.request({
-    method: 'snap_getBip44Entropy',
-    params: {
-      coinType: 3,
-    },
-  });
-  const deriveDogecoinAddress = await getBIP44AddressKeyDeriver(dogecoinNode);
-  const secondAccount = await deriveDogecoinAddress(1);
-  const { publicKey } = secondAccount;
+  const derivedAccount = await getDerivedAccount();
+  const { publicKey } = derivedAccount;
   return publicKey;
 }
 

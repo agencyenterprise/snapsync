@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import {
   Card,
@@ -7,9 +7,10 @@ import {
   ReconnectButton,
   SendMessageButton,
 } from '../components';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
+import { MetaMaskContext, MetamaskActions } from '../hooks';
 import {
   connectSnap,
+  dencrypt,
   encrypt,
   getSnap,
   sendClearState,
@@ -104,6 +105,9 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [encrypted, setEncrypted] = useState('');
+  const [toEncrypt, setToEncrypt] = useState('');
+  const [toDecrypt, setToDecrypt] = useState('');
 
   const handleConnectClick = async () => {
     try {
@@ -152,8 +156,16 @@ const Index = () => {
 
   const handleEncryptClick = async () => {
     try {
-      await encrypt({ foo: 'bar' });
-      console.log('data encrypted');
+      await encrypt({ toEncrypt });
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleDencryptClick = async () => {
+    try {
+      await dencrypt(toDecrypt);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -278,10 +290,54 @@ const Index = () => {
         <Card
           content={{
             title: 'Encrypyt Data',
-            description: 'Encrypt data using the snap.',
+            description: (
+              <div>
+                <p>Encrypt data using the snap.</p>
+                <input
+                  type="text"
+                  id="encrypt"
+                  name="encrypt"
+                  defaultValue={toEncrypt}
+                  onChange={(e) => {
+                    setToEncrypt(e.target.value);
+                  }}
+                />
+              </div>
+            ),
             button: (
               <SendMessageButton
                 onClick={handleEncryptClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Encrypyt Data',
+            description: (
+              <div>
+                <p>Decrypt data using the snap.</p>
+                <input
+                  type="text"
+                  id="encrypt"
+                  name="encrypt"
+                  defaultValue={toDecrypt}
+                  onChange={(e) => {
+                    setToDecrypt(e.target.value);
+                  }}
+                />
+              </div>
+            ),
+            button: (
+              <SendMessageButton
+                onClick={handleDencryptClick}
                 disabled={!state.installedSnap}
               />
             ),

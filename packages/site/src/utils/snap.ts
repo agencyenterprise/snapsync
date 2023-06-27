@@ -90,12 +90,12 @@ export const encrypt = async (data: Record<string, unknown>) => {
   });
 };
 
-export const dencrypt = async (encruptedData: string) => {
+export const dencrypt = async (encryptedData: string) => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
-      request: { method: 'encrypt', params: [encruptedData] },
+      request: { method: 'decrypt', params: [encryptedData] },
     },
   });
 };
