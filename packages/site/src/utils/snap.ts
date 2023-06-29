@@ -1,4 +1,4 @@
-import { defaultSnapOrigin } from '../config';
+import { defaultOtherSnapOrigin, defaultSnapOrigin } from '../config';
 import { GetSnapsResponse, Snap } from '../types';
 
 /**
@@ -19,7 +19,7 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  * @param params - The params to pass with the snap to connect.
  */
 export const connectSnap = async (
-  snapId: string = defaultSnapOrigin,
+  snapId: string,
   params: Record<'version' | string, unknown> = {},
 ) => {
   await window.ethereum.request({
@@ -33,16 +33,20 @@ export const connectSnap = async (
 /**
  * Get the snap from MetaMask.
  *
+ * @param id - The ID of the snap to install.
  * @param version - The version of the snap to install (optional).
  * @returns The snap object returned by the extension.
  */
-export const getSnap = async (version?: string): Promise<Snap | undefined> => {
+export const getSnap = async (
+  id: string,
+  version?: string,
+): Promise<Snap | undefined> => {
   try {
     const snaps = await getSnaps();
 
+    console.log(Object.values(snaps));
     return Object.values(snaps).find(
-      (snap) =>
-        snap.id === defaultSnapOrigin && (!version || snap.version === version),
+      (snap) => snap.id === id && (!version || snap.version === version),
     );
   } catch (e) {
     console.log('Failed to obtain installed snap', e);
@@ -54,7 +58,7 @@ export const sendSaveState = async (data: object) => {
   return window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
-      snapId: defaultSnapOrigin,
+      snapId: defaultOtherSnapOrigin,
       request: { method: 'saveState', params: { data } },
     },
   });
@@ -64,7 +68,7 @@ export const sendGetState = async () => {
   return window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
-      snapId: defaultSnapOrigin,
+      snapId: defaultOtherSnapOrigin,
       request: { method: 'getState' },
     },
   });
@@ -74,7 +78,7 @@ export const sendClearState = async () => {
   return window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
-      snapId: defaultSnapOrigin,
+      snapId: defaultOtherSnapOrigin,
       request: { method: 'clearState' },
     },
   });
@@ -116,6 +120,36 @@ export const downloadFromIPFS = async (cid: string) => {
     params: {
       snapId: defaultSnapOrigin,
       request: { method: 'downloadFromIPFS', params: [cid] },
+    },
+  });
+};
+
+export const updateIPFS = async (cid: string, data: string) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'updateIPFS', params: [cid, data] },
+    },
+  });
+};
+
+export const encryptWithOtherSnap = async (data: Record<string, unknown>) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultOtherSnapOrigin,
+      request: { method: 'encryptWithOtherSnap', params: [data] },
+    },
+  });
+};
+
+export const getGlobalState = async () => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'getState' },
     },
   });
 };

@@ -25,3 +25,19 @@ export async function downloadFromIPFSStorage(cid: string): Promise<string> {
   const data = await ipfsClient.get(cid);
   return data;
 }
+
+/**
+ * Updates the encrypted data on IPFS.
+ *
+ * @param cid - The CID of the data to update.
+ * @param data - The new data.
+ * @returns The new CID.
+ * @throws If the data cannot be updated.
+ */
+export async function updateIPFSStorage(
+  cid: string,
+  data: string,
+): Promise<string> {
+  const ipfsClient = new PinataIPFSService();
+  return await ipfsClient.update(cid, data);
+}

@@ -6,12 +6,14 @@ import {
   useEffect,
   useReducer,
 } from 'react';
+import { defaultOtherSnapOrigin, defaultSnapOrigin } from '../config';
 import { Snap } from '../types';
-import { isFlask, getSnap } from '../utils';
+import { getSnap, isFlask } from '../utils';
 
 export type MetamaskState = {
   isFlask: boolean;
   installedSnap?: Snap;
+  otherSnapInstalled?: Snap;
   error?: Error;
 };
 
@@ -33,6 +35,7 @@ export const MetaMaskContext = createContext<
 
 export enum MetamaskActions {
   SetInstalled = 'SetInstalled',
+  SetOtherSnapInstalled = 'SetOtherSnapInstalled',
   SetFlaskDetected = 'SetFlaskDetected',
   SetError = 'SetError',
 }
@@ -43,6 +46,12 @@ const reducer: Reducer<MetamaskState, MetamaskDispatch> = (state, action) => {
       return {
         ...state,
         installedSnap: action.payload,
+      };
+
+    case MetamaskActions.SetOtherSnapInstalled:
+      return {
+        ...state,
+        otherSnapInstalled: action.payload,
       };
 
     case MetamaskActions.SetFlaskDetected:
@@ -86,18 +95,23 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
       });
     }
 
-    async function detectSnapInstalled() {
-      const installedSnap = await getSnap();
+    async function detectSnapsInstalled() {
+      const installedSnap = await getSnap(defaultSnapOrigin);
       dispatch({
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
+      });
+      const otherSnapInstalled = await getSnap(defaultOtherSnapOrigin);
+      dispatch({
+        type: MetamaskActions.SetOtherSnapInstalled,
+        payload: otherSnapInstalled,
       });
     }
 
     detectFlask();
 
     if (state.isFlask) {
-      detectSnapInstalled();
+      detectSnapsInstalled();
     }
   }, [state.isFlask, window.ethereum]);
 

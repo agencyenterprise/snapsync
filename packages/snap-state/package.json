@@ -1,6 +1,6 @@
 {
-  "name": "@jayremias/snap-state",
-  "version": "0.0.2",
+  "name": "snap-state",
+  "version": "0.0.1",
   "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
   "repository": {
     "type": "git",

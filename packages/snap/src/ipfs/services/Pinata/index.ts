@@ -2,6 +2,32 @@ import { IPFSAbstract } from '../../IPFSAbstract';
 import { config } from './config';
 
 export class PinataIPFSService extends IPFSAbstract {
+  async delete(hash: string): Promise<boolean> {
+    if (!config.token) {
+      throw new Error('Pinata token not found');
+    }
+    const response = await fetch(`${config.url}/pinning/unpin/${hash}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('failed to delete');
+    }
+    return true;
+  }
+
+  async update(hash: string, data: string): Promise<string> {
+    if (!config.token) {
+      throw new Error('Pinata token not found');
+    }
+    await this.delete(hash);
+    const response = await this.put(data);
+    return response;
+  }
+
   async put(data: string): Promise<string> {
     const uuid = Math.random().toString(36).substring(7);
 
@@ -38,7 +64,6 @@ export class PinataIPFSService extends IPFSAbstract {
       throw new Error('failed to get');
     }
     const data = await response.json();
-    console.log({ data });
     return data;
 
     // const response = await fetch(
