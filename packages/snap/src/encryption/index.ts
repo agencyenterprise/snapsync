@@ -8,7 +8,7 @@ import { decrypt, encrypt } from 'eciesjs';
  * @param coinType - The coin type to use.
  * @returns The derived account from the MetaMask wallet.
  */
-export async function getDerivedAccount(coinType = 3): Promise<BIP44Node> {
+export async function getDerivedAccount(coinType = 966): Promise<BIP44Node> {
   const coinNode = await snap.request({
     method: 'snap_getBip44Entropy',
     params: {
