@@ -7,16 +7,22 @@ import {
   ReconnectButton,
   SendMessageButton,
 } from '../components';
+import { defaultOtherSnapOrigin, defaultSnapOrigin } from '../config';
 import { MetaMaskContext, MetamaskActions } from '../hooks';
 import {
   connectSnap,
   dencrypt,
+  downloadFromIPFS,
   encrypt,
+  encryptWithOtherSnap,
+  getGlobalState,
   getSnap,
   sendClearState,
   sendGetState,
   sendSaveState,
   shouldDisplayReconnectButton,
+  updateIPFS,
+  uploadToIPFS,
 } from '../utils';
 
 const Container = styled.div`
@@ -57,13 +63,25 @@ const Subtitle = styled.p`
 
 const CardContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
   max-width: 64.8rem;
+  gap: 2.4rem;
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
+`;
+
+const CardGroup = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0 1.2rem;
+  border-radius: ${({ theme }) => theme.radii.default};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
 `;
 
 const Notice = styled.div`
@@ -105,17 +123,43 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-  const [encrypted, setEncrypted] = useState('');
+  const [toIPFS, setToIPFS] = useState('');
+  const [fromIPFS, setFromIPFS] = useState('');
   const [toEncrypt, setToEncrypt] = useState('');
   const [toDecrypt, setToDecrypt] = useState('');
 
+  const handleEncryptWithSnapClick = async () => {
+    console.log('encrypting with snap');
+    try {
+      await encryptWithOtherSnap({ test: 'encrypting with snap' });
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleConnectClick = async () => {
     try {
-      await connectSnap();
-      const installedSnap = await getSnap();
+      await connectSnap(defaultSnapOrigin);
+      const installedSnap = await getSnap(defaultSnapOrigin);
 
       dispatch({
         type: MetamaskActions.SetInstalled,
+        payload: installedSnap,
+      });
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleConnectOtherClick = async () => {
+    try {
+      await connectSnap(defaultOtherSnapOrigin);
+      const installedSnap = await getSnap(defaultOtherSnapOrigin);
+
+      dispatch({
+        type: MetamaskActions.SetOtherSnapInstalled,
         payload: installedSnap,
       });
     } catch (e) {
@@ -137,7 +181,7 @@ const Index = () => {
   const handleGetState = async () => {
     try {
       const data = await sendGetState();
-      console.log('current state:', data?.data);
+      console.log('current state:', data);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -154,6 +198,15 @@ const Index = () => {
     }
   };
 
+  const handleGetSyncSnapState = async () => {
+    try {
+      await getGlobalState();
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
+    }
+  };
+
   const handleEncryptClick = async () => {
     try {
       await encrypt({ toEncrypt });
@@ -166,6 +219,36 @@ const Index = () => {
   const handleDencryptClick = async () => {
     try {
       await dencrypt(toDecrypt);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleUploadString = async () => {
+    try {
+      await uploadToIPFS(toIPFS);
+      console.log('data uploaded');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleDownloadString = async () => {
+    try {
+      await downloadFromIPFS(fromIPFS);
+      console.log('data downloaded');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleUpdateString = async () => {
+    try {
+      await updateIPFS(fromIPFS, toIPFS);
+      console.log('data downloaded');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -197,40 +280,134 @@ const Index = () => {
             fullWidth
           />
         )}
-        {!state.installedSnap && (
+
+        <CardGroup>
+          {!state.otherSnapInstalled && (
+            <Card
+              content={{
+                title: 'Connect State Snap',
+                description: 'Get started by connecting state snap.',
+                button: (
+                  <ConnectButton
+                    onClick={handleConnectOtherClick}
+                    disabled={!state.isFlask}
+                  />
+                ),
+              }}
+              disabled={!state.isFlask}
+            />
+          )}
+          {shouldDisplayReconnectButton(state.otherSnapInstalled) && (
+            <Card
+              content={{
+                title: 'Reconnect State Snap',
+                description:
+                  'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+                button: (
+                  <ReconnectButton
+                    onClick={handleConnectOtherClick}
+                    disabled={!state.otherSnapInstalled}
+                  />
+                ),
+              }}
+              disabled={!state.otherSnapInstalled}
+            />
+          )}
           <Card
             content={{
-              title: 'Connect',
+              title: 'Encrypt usind Snap',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Try to invoke other snap to encrypt a string using the encrypt method.',
               button: (
-                <ConnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.isFlask}
-                />
-              ),
-            }}
-            disabled={!state.isFlask}
-          />
-        )}
-        {shouldDisplayReconnectButton(state.installedSnap) && (
-          <Card
-            content={{
-              title: 'Reconnect',
-              description:
-                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
-              button: (
-                <ReconnectButton
-                  onClick={handleConnectClick}
+                <SendMessageButton
+                  onClick={handleEncryptWithSnapClick}
                   disabled={!state.installedSnap}
                 />
               ),
             }}
             disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
           />
-        )}
+          <Card
+            content={{
+              title: 'Send handleSaveState Message',
+              description:
+                'Display a custom message within a confirmation screen in MetaMask.',
+              button: (
+                <SendMessageButton
+                  onClick={handleSaveState}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Send handleGetState Message',
+              description:
+                'Display a custom message within a confirmation screen in MetaMask.',
+              button: (
+                <SendMessageButton
+                  onClick={handleGetState}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Send handleClearState Message',
+              description:
+                'Display a custom message within a confirmation screen in MetaMask.',
+              button: (
+                <SendMessageButton
+                  onClick={handleClearState}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        </CardGroup>
+        <CardGroup>
+          {!state.installedSnap && (
+            <Card
+              content={{
+                title: 'Connect Sync Snap',
+                description: 'Get started by connecting sync snap',
+                button: (
+                  <ConnectButton
+                    onClick={handleConnectClick}
+                    disabled={!state.isFlask}
+                  />
+                ),
+              }}
+              disabled={!state.isFlask}
+            />
+          )}
 
-        <Card
+          {/* <Card
           content={{
             title: 'Send handleSaveState Message',
             description:
@@ -286,69 +463,262 @@ const Index = () => {
             Boolean(state.installedSnap) &&
             !shouldDisplayReconnectButton(state.installedSnap)
           }
-        />
-        <Card
-          content={{
-            title: 'Encrypyt Data',
-            description: (
-              <div>
-                <p>Encrypt data using the snap.</p>
-                <input
-                  type="text"
-                  id="encrypt"
-                  name="encrypt"
-                  defaultValue={toEncrypt}
-                  onChange={(e) => {
-                    setToEncrypt(e.target.value);
-                  }}
+        /> */}
+          <Card
+            content={{
+              title: 'Encrypt Data',
+              description: (
+                <div>
+                  <p>Encrypt data using the snap.</p>
+                  <input
+                    type="text"
+                    placeholder="String to encrypt"
+                    defaultValue={toEncrypt}
+                    onChange={(e) => {
+                      setToEncrypt(e.target.value);
+                    }}
+                  />
+                </div>
+              ),
+              button: (
+                <SendMessageButton
+                  onClick={handleEncryptClick}
+                  disabled={!state.installedSnap}
                 />
-              </div>
-            ),
-            button: (
-              <SendMessageButton
-                onClick={handleEncryptClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Encrypyt Data',
-            description: (
-              <div>
-                <p>Decrypt data using the snap.</p>
-                <input
-                  type="text"
-                  id="encrypt"
-                  name="encrypt"
-                  defaultValue={toDecrypt}
-                  onChange={(e) => {
-                    setToDecrypt(e.target.value);
-                  }}
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Decrypt Data',
+              description: (
+                <div>
+                  <p>Decrypt string</p>
+                  <input
+                    type="text"
+                    placeholder="String to decrypt"
+                    defaultValue={toDecrypt}
+                    onChange={(e) => {
+                      setToDecrypt(e.target.value);
+                    }}
+                  />
+                </div>
+              ),
+              button: (
+                <SendMessageButton
+                  onClick={handleDencryptClick}
+                  disabled={!state.installedSnap}
                 />
-              </div>
-            ),
-            button: (
-              <SendMessageButton
-                onClick={handleDencryptClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          {shouldDisplayReconnectButton(state.installedSnap) && (
+            <Card
+              content={{
+                title: 'Reconnect Sync Snap',
+                description:
+                  'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+                button: (
+                  <ReconnectButton
+                    onClick={handleConnectClick}
+                    disabled={!state.installedSnap}
+                  />
+                ),
+              }}
+              disabled={!state.installedSnap}
+            />
+          )}
+
+          <Card
+            content={{
+              title: 'Get State',
+              description: 'Try to get state from other snaps.',
+              button: (
+                <SendMessageButton
+                  onClick={handleGetSyncSnapState}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Encrypt Data',
+              description: (
+                <div>
+                  <p>Encrypt data using the snap.</p>
+                  <input
+                    type="text"
+                    placeholder="String to encrypt"
+                    defaultValue={toEncrypt}
+                    onChange={(e) => {
+                      setToEncrypt(e.target.value);
+                    }}
+                  />
+                </div>
+              ),
+              button: (
+                <SendMessageButton
+                  onClick={handleEncryptClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Decrypt Data',
+              description: (
+                <div>
+                  <p>Decrypt string</p>
+                  <input
+                    type="text"
+                    placeholder="String to decrypt"
+                    defaultValue={toDecrypt}
+                    onChange={(e) => {
+                      setToDecrypt(e.target.value);
+                    }}
+                  />
+                </div>
+              ),
+              button: (
+                <SendMessageButton
+                  onClick={handleDencryptClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Upload to IPFS',
+              description: (
+                <div>
+                  <p>Upload string to IPFS and returns the CID</p>
+                  <input
+                    type="text"
+                    placeholder="String to upload to IPFS"
+                    defaultValue={toIPFS}
+                    onChange={(e) => {
+                      setToIPFS(e.target.value);
+                    }}
+                  />
+                </div>
+              ),
+              button: (
+                <SendMessageButton
+                  onClick={handleUploadString}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Download from IPFS',
+              description: (
+                <div>
+                  <p>Get encrypted string from IPFS using the CID</p>
+                  <input
+                    type="text"
+                    placeholder="CID"
+                    defaultValue={fromIPFS}
+                    onChange={(e) => {
+                      setFromIPFS(e.target.value);
+                    }}
+                  />
+                </div>
+              ),
+              button: (
+                <SendMessageButton
+                  onClick={handleDownloadString}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Update data on IPFS',
+              description: (
+                <div>
+                  <p>Get encrypted string from IPFS using the CID</p>
+                  <input
+                    type="text"
+                    placeholder="New content"
+                    defaultValue={toIPFS}
+                    onChange={(e) => {
+                      setToIPFS(e.target.value);
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="CID"
+                    defaultValue={fromIPFS}
+                    onChange={(e) => {
+                      setFromIPFS(e.target.value);
+                    }}
+                  />
+                </div>
+              ),
+              button: (
+                <SendMessageButton
+                  onClick={handleUpdateString}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        </CardGroup>
+
         <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}

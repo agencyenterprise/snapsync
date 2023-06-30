@@ -1,7 +1,6 @@
 {
-  "name": "snap",
-  "version": "0.1.0",
-  "private": true,
+  "name": "snap-state",
+  "version": "0.0.1",
   "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
   "repository": {
     "type": "git",
@@ -28,10 +27,7 @@
   "dependencies": {
     "@metamask/key-tree": "^7.1.1",
     "@metamask/snaps-types": "^0.32.2",
-    "@metamask/snaps-ui": "^0.32.2",
-    "buffer": "^6.0.3",
-    "dotenv": "^16.3.1",
-    "eciesjs": "^0.3.17"
+    "@metamask/snaps-ui": "^0.32.2"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.0.3",

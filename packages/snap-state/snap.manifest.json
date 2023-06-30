@@ -1,34 +1,29 @@
 {
-  "version": "0.1.0",
-  "description": "Keep data synced between devices.",
-  "proposedName": "IPFS Sync Snap",
+  "version": "0.0.1",
+  "description": "An example Snap written in TypeScript.",
+  "proposedName": "TypeScript Example Snap",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "PoT0rV9V5MSL2o2nNSPdasjalqdfTTmx3kjif6yuW94=",
+    "shasum": "VnR0eZ9TYWioFJKG+fdFfBbTsmFNCYF3opJzBQjmh1I=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "snap",
+        "packageName": "snap-state",
         "registry": "https://registry.npmjs.org/"
       }
     }
   },
   "initialPermissions": {
     "snap_dialog": {},
+    "snap_manageState": {},
     "endowment:rpc": {
       "dapps": true,
       "snaps": true
-    },
-    "endowment:network-access": {},
-    "snap_getBip44Entropy": [
-      {
-        "coinType": 3
-      }
-    ]
+    }
   },
   "manifestVersion": "0.1"
 }
