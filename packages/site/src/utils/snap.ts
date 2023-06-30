@@ -1,5 +1,5 @@
 import { defaultOtherSnapOrigin, defaultSnapOrigin } from '../config';
-import { GetSnapsResponse, Snap } from '../types';
+import { GetSnapsResponse, IPFS, Snap } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -152,6 +152,17 @@ export const getGlobalState = async () => {
       request: { method: 'getState' },
     },
   });
+};
+
+export const getIPFSList = async (): Promise<IPFS[]> => {
+  const response = await window.ethereum.request<IPFS[]>({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'listIPFS' },
+    },
+  });
+  return (response ?? []) as IPFS[];
 };
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
