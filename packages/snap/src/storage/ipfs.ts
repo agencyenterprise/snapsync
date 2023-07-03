@@ -41,3 +41,15 @@ export async function updateIPFSStorage(
   const ipfsClient = new PinataIPFSService();
   return await ipfsClient.update(cid, data);
 }
+
+/**
+ * Lists all the hashes on IPFS.
+ *
+ * @returns The list of hashes.
+ * @throws If the hashes cannot be listed.
+ * @todo Implement pagination.
+ */
+export async function listIPFSStorage(): Promise<string[]> {
+  const ipfsClient = new PinataIPFSService();
+  return await ipfsClient.getAll();
+}

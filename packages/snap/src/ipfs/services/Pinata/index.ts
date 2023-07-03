@@ -2,6 +2,42 @@ import { IPFSAbstract } from '../../IPFSAbstract';
 import { config } from './config';
 
 export class PinataIPFSService extends IPFSAbstract {
+  async getAll(page = 1): Promise<string[]> {
+    if (!config.token) {
+      throw new Error('Pinata token not found');
+    }
+
+    const limit = 1000;
+    const offset = limit * (page - 1);
+
+    let hasMore = true;
+    const rows = [];
+
+    do {
+      const response = await fetch(
+        `${config.url}/data/pinList?status=pinned&pageOffset=${offset}&pageLimit=${limit}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${config.token}`,
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error('failed to get');
+      }
+
+      const data = await response.json();
+
+      rows.push(...data.rows);
+
+      hasMore = data.rows >= limit;
+    } while (hasMore);
+
+    return rows;
+  }
+
   async delete(hash: string): Promise<boolean> {
     if (!config.token) {
       throw new Error('Pinata token not found');
@@ -65,22 +101,5 @@ export class PinataIPFSService extends IPFSAbstract {
     }
     const data = await response.json();
     return data;
-
-    // const response = await fetch(
-    //   `${config.url}/data/pinList?hashContains=${hash}`,
-    //   {
-    //     method: 'GET',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       Authorization: `Bearer ${config.token}`,
-    //     },
-    //   },
-    // );
-    // if (!response.ok) {
-    //   throw new Error('failed to get');
-    // }
-    // const data = await response.json();
-    // console.log({ data });
-    // return data;
   }
 }

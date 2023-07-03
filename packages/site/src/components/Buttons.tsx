@@ -1,7 +1,7 @@
 import { ComponentProps } from 'react';
 import styled from 'styled-components';
-import { MetamaskState } from '../hooks';
 import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
+import { MetamaskState } from '../hooks';
 import { shouldDisplayReconnectButton } from '../utils';
 
 const Link = styled.a`
@@ -32,7 +32,7 @@ const Link = styled.a`
   }
 `;
 
-const Button = styled.button`
+export const Button = styled.button`
   display: flex;
   align-self: flex-start;
   align-items: center;
@@ -68,6 +68,10 @@ const ConnectedIndicator = styled.div`
   border-radius: 50%;
   background-color: green;
 `;
+
+export const NavigationButton = (props: ComponentProps<typeof Link>) => {
+  return <Link {...props}>{props.children}</Link>;
+};
 
 export const InstallFlaskButton = () => (
   <Link href="https://metamask.io/flask/" target="_blank">

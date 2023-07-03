@@ -3,6 +3,7 @@ import { panel, text } from '@metamask/snaps-ui';
 import { decryptData, encryptData } from './encryption';
 import {
   downloadFromIPFSStorage,
+  listIPFSStorage,
   updateIPFSStorage,
   uploadToIPFSStorage,
 } from './storage/ipfs';
@@ -58,6 +59,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       });
     }
 
+    case 'listIPFS':
+      return listIPFSStorage();
     case 'encrypt':
       return encryptData(request.params).then((encrypted) => {
         return snap.request({

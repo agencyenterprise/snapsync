@@ -4,6 +4,7 @@ import {
   Card,
   ConnectButton,
   InstallFlaskButton,
+  NavigationButton,
   ReconnectButton,
   SendMessageButton,
 } from '../components';
@@ -14,7 +15,6 @@ import {
   dencrypt,
   downloadFromIPFS,
   encrypt,
-  encryptWithOtherSnap,
   getGlobalState,
   getSnap,
   sendClearState,
@@ -127,16 +127,6 @@ const Index = () => {
   const [fromIPFS, setFromIPFS] = useState('');
   const [toEncrypt, setToEncrypt] = useState('');
   const [toDecrypt, setToDecrypt] = useState('');
-
-  const handleEncryptWithSnapClick = async () => {
-    console.log('encrypting with snap');
-    try {
-      await encryptWithOtherSnap({ test: 'encrypting with snap' });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
 
   const handleConnectClick = async () => {
     try {
@@ -258,11 +248,11 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Import / Export your data to <Span>IPFS</Span>
       </Heading>
-      <Subtitle>
-        Get started by editing <code>src/index.ts</code>
-      </Subtitle>
+      <CardContainer>
+        <NavigationButton href="/dashboard">Dashboard</NavigationButton>
+      </CardContainer>
       <CardContainer>
         {state.error && (
           <ErrorMessage>
@@ -313,25 +303,6 @@ const Index = () => {
               disabled={!state.otherSnapInstalled}
             />
           )}
-          <Card
-            content={{
-              title: 'Encrypt usind Snap',
-              description:
-                'Try to invoke other snap to encrypt a string using the encrypt method.',
-              button: (
-                <SendMessageButton
-                  onClick={handleEncryptWithSnapClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
           <Card
             content={{
               title: 'Send handleSaveState Message',
@@ -407,63 +378,6 @@ const Index = () => {
             />
           )}
 
-          {/* <Card
-          content={{
-            title: 'Send handleSaveState Message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
-            button: (
-              <SendMessageButton
-                onClick={handleSaveState}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Send handleGetState Message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
-            button: (
-              <SendMessageButton
-                onClick={handleGetState}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Send handleClearState Message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
-            button: (
-              <SendMessageButton
-                onClick={handleClearState}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        /> */}
           <Card
             content={{
               title: 'Encrypt Data',

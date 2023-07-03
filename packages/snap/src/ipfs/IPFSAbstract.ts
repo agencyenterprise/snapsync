@@ -24,4 +24,9 @@ export abstract class IPFSAbstract {
    * @throws if data not found
    */
   abstract update(hash: string, data: string): Promise<string>;
+
+  /**
+   * Get all hashes from IPFS
+   */
+  abstract getAll(page?: number | string): Promise<string[]>;
 }
