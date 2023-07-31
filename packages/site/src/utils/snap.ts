@@ -1,5 +1,5 @@
 import { defaultSnapOrigin } from '../config';
-import { GetSnapsResponse, IPFS, Snap } from '../types';
+import { GetSnapsResponse, Snap } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -53,66 +53,6 @@ export const getSnap = async (
   }
 };
 
-export const sendSaveState = async (_data: object) => {
-  // return window.ethereum.request({
-  //   method: 'wallet_invokeSnap',
-  //   params: {
-  //     snapId: defaultOtherSnapOrigin,
-  //     request: { method: 'saveState', params: { data } },
-  //   },
-  // });
-};
-
-export const sendGetState = async () => {
-  // return window.ethereum.request({
-  //   method: 'wallet_invokeSnap',
-  //   params: {
-  //     snapId: defaultOtherSnapOrigin,
-  //     request: { method: 'getState' },
-  //   },
-  // });
-};
-
-export const sendClearState = async () => {
-  // return window.ethereum.request({
-  //   method: 'wallet_invokeSnap',
-  //   params: {
-  //     snapId: defaultOtherSnapOrigin,
-  //     request: { method: 'clearState' },
-  //   },
-  // });
-};
-
-// export const uploadToIPFS = async (encryptedData: string) => {
-//   await window.ethereum.request({
-//     method: 'wallet_invokeSnap',
-//     params: {
-//       snapId: defaultSnapOrigin,
-//       request: { method: 'uploadToIPFS', params: [encryptedData] },
-//     },
-//   });
-// };
-
-// export const downloadFromIPFS = async (cid: string) => {
-//   await window.ethereum.request({
-//     method: 'wallet_invokeSnap',
-//     params: {
-//       snapId: defaultSnapOrigin,
-//       request: { method: 'downloadFromIPFS', params: [cid] },
-//     },
-//   });
-// };
-
-// export const updateIPFS = async (cid: string, data: string) => {
-//   await window.ethereum.request({
-//     method: 'wallet_invokeSnap',
-//     params: {
-//       snapId: defaultSnapOrigin,
-//       request: { method: 'updateIPFS', params: [cid, data] },
-//     },
-//   });
-// };
-
 export const getGlobalState = async () => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -123,24 +63,19 @@ export const getGlobalState = async () => {
   });
 };
 
-export const getIPFSList = async (): Promise<IPFS[]> => {
-  const response = await window.ethereum.request<IPFS[]>({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: { method: 'listIPFS' },
-    },
-  });
-  return (response ?? []) as IPFS[];
-};
-
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
 
-export const getAPIKey = async (snapId: string) => {
+/**
+ * Get saved API key in the sync snap.
+ *
+ * @param syncSnapId - The ID of the sync snap.
+ * @returns Saved API key content.
+ */
+export const getAPIKey = async (syncSnapId: string) => {
   const response = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
-      snapId,
+      snapId: syncSnapId,
       request: { method: 'get_api_key' },
     },
   });
@@ -148,15 +83,70 @@ export const getAPIKey = async (snapId: string) => {
   return response as { apiKey: string };
 };
 
+/**
+ * Update saved API key in the sync snap.
+ *
+ * @param syncSnapId - The ID of the sync snap.
+ * @param apiKey - The API key to save.
+ */
 export const saveAPIKey = async (
-  snapId: string,
+  syncSnapId: string,
   apiKey: string,
 ): Promise<void> => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
-      snapId,
+      snapId: syncSnapId,
       request: { method: 'save_api_key', params: { apiKey } },
+    },
+  });
+};
+
+/**
+ * Get saved state in the sync snap. The snap ID is automatically identified by the request information.
+ *
+ * @param syncSnapId - The ID of the sync snap.
+ */
+export const getPersistedState = async (syncSnapId: string) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: syncSnapId,
+      request: { method: 'get' },
+    },
+  });
+};
+
+/**
+ * Persist state in the sync snap. The snap ID is automatically identified by the request information.
+ *
+ * @param syncSnapId - The ID of the sync snap.
+ * @param state - The state to persist.
+ */
+export const persistState = async (
+  syncSnapId: string,
+  state: Record<string, unknown>,
+) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: syncSnapId,
+      request: { method: 'set', params: state },
+    },
+  });
+};
+
+/**
+ * Clear snap state in the sync snap. The snap ID is automatically identified by the request information.
+ *
+ * @param syncSnapId - The ID of the sync snap.
+ */
+export const clearState = async (syncSnapId: string) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: syncSnapId,
+      request: { method: 'clear' },
     },
   });
 };

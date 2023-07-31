@@ -9,17 +9,20 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
+  Input,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext, MetamaskActions } from '../hooks';
 import {
+  clearState,
   connectSnap,
   getAPIKey,
+  getPersistedState,
   getSnap,
+  persistState,
   saveAPIKey,
   shouldDisplayReconnectButton,
 } from '../utils';
-import { Input } from '../components/Input';
 
 const Container = styled.div`
   display: flex;
@@ -65,11 +68,10 @@ const ErrorMessage = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.error.default};
   color: ${({ theme }) => theme.colors.error.alternative};
   border-radius: ${({ theme }) => theme.radii.default};
-  grid-column: 1 / 1;
+  grid-column: span 2 / span 2;
   padding: 2.4rem;
   margin-bottom: 2.4rem;
   margin-top: 2.4rem;
-  max-width: 60rem;
   width: 100%;
   ${({ theme }) => theme.mediaQueries.small} {
     padding: 1.6rem;
@@ -92,6 +94,28 @@ const Index = () => {
           console.error(e);
           dispatch({ type: MetamaskActions.SetError, payload: e });
         });
+    }
+  }, [state.installedSnap]);
+
+  useEffect(() => {
+    function handleError(e: any) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+
+    if (state.installedSnap) {
+      // clearState(state.installedSnap.id)
+      //   .then(() => console.log('Clean! 🧹'))
+      //   .catch(handleError);
+      // getPersistedState(state.installedSnap.id)
+      //   .then((r) => console.log(r))
+      //   .catch(handleError);
+      // persistState(state.installedSnap.id, {
+      //   firstName: 'Daniel',
+      //   surname: 'Cruz',
+      // })
+      //   .then(() => console.log('Success! 🚀'))
+      //   .catch(handleError);
     }
   }, [state.installedSnap]);
 

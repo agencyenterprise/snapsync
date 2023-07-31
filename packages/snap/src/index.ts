@@ -1,5 +1,8 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
+
 import { getState, saveState } from './storage/local';
+import { stringToHex } from './utils/string';
+import { PinataIPFSService } from './ipfs/service';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -7,59 +10,30 @@ import { getState, saveState } from './storage/local';
  * @param args - The request handler args as object.
  * invoked the snap.
  * @param args.request - A validated JSON-RPC request object.
+ * @param args.origin -
  * @returns The result of `snap_dialog`.
  * @throws If the request method is not valid for this snap.
  */
-export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
+export const onRpcRequest: OnRpcRequestHandler = async ({
+  request,
+  origin,
+}) => {
   switch (request.method) {
     // TODO Verify that the snap is the one that invoked the request. Others snaps should not be able to invoke this snap's methods.
     case 'get_api_key':
       return handleGetAPIKey();
+
     case 'save_api_key':
       return handleSaveAPIKey((request.params as { apiKey: string }).apiKey);
 
-    // case 'uploadToIPFS':
-    //   return uploadToIPFSStorage(request.params[0] as string).then(
-    //     (cid: string) => {
-    //       return snap.request({
-    //         method: 'snap_dialog',
-    //         params: {
-    //           type: 'alert',
-    //           content: panel([text(`Uploaded! CID: **${cid}**`)]),
-    //         },
-    //       });
-    //     },
-    //   );
-    // case 'downloadFromIPFS':
-    //   return downloadFromIPFSStorage(request.params[0] as string).then(
-    //     (data: string) => {
-    //       return snap.request({
-    //         method: 'snap_dialog',
-    //         params: {
-    //           type: 'alert',
-    //           content: panel([text(`Downloading from IPFS: **${data}**`)]),
-    //         },
-    //       });
-    //     },
-    //   );
+    case 'get':
+      return handleGet(origin);
 
-    // case 'updateIPFS': {
-    //   return updateIPFSStorage(
-    //     request.params[0] as unknown as string,
-    //     request.params[1] as unknown as string,
-    //   ).then((cid: string) => {
-    //     return snap.request({
-    //       method: 'snap_dialog',
-    //       params: {
-    //         type: 'alert',
-    //         content: panel([text(`${cid} Updated!`)]),
-    //       },
-    //     });
-    //   });
-    // }
+    case 'set':
+      return handleSave(origin, request.params || {});
 
-    // case 'listIPFS':
-    //   return listIPFSStorage();
+    case 'clear':
+      return handleClear(origin);
 
     default:
       throw new Error('Method not found.');
@@ -84,4 +58,35 @@ async function handleGetAPIKey(): Promise<{ apiKey: string }> {
 async function handleSaveAPIKey(apiKey: string): Promise<void> {
   const state = await getState();
   await saveState({ ...state, apiKey });
+}
+
+/**
+ * Get snap state from IPFS.
+ *
+ * @param snapId - The snap ID.
+ */
+async function handleGet(snapId: string): Promise<unknown> {
+  const encodedId = stringToHex(snapId);
+  return await PinataIPFSService.instance.get(encodedId);
+}
+
+/**
+ * Save snap state to IPFS.
+ *
+ * @param snapId - The snap ID.
+ * @param snapState - The snap state.
+ */
+async function handleSave(snapId: string, snapState: unknown): Promise<void> {
+  const encodedId = stringToHex(snapId);
+  await PinataIPFSService.instance.set(encodedId, snapState);
+}
+
+/**
+ * Clear snap state from IPFS.
+ *
+ * @param snapId - The snap ID.
+ */
+async function handleClear(snapId: string): Promise<void> {
+  const encodedId = stringToHex(snapId);
+  await PinataIPFSService.instance.delete(encodedId);
 }
