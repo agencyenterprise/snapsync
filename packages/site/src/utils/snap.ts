@@ -44,7 +44,6 @@ export const getSnap = async (
   try {
     const snaps = await getSnaps();
 
-    console.log(Object.values(snaps));
     return Object.values(snaps).find(
       (snap) => snap.id === id && (!version || snap.version === version),
     );
@@ -84,65 +83,35 @@ export const sendClearState = async () => {
   // });
 };
 
-export const encrypt = async (data: Record<string, unknown>) => {
-  await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: { method: 'encrypt', params: [data] },
-    },
-  });
-};
+// export const uploadToIPFS = async (encryptedData: string) => {
+//   await window.ethereum.request({
+//     method: 'wallet_invokeSnap',
+//     params: {
+//       snapId: defaultSnapOrigin,
+//       request: { method: 'uploadToIPFS', params: [encryptedData] },
+//     },
+//   });
+// };
 
-export const dencrypt = async (encryptedData: string) => {
-  await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: { method: 'decrypt', params: [encryptedData] },
-    },
-  });
-};
+// export const downloadFromIPFS = async (cid: string) => {
+//   await window.ethereum.request({
+//     method: 'wallet_invokeSnap',
+//     params: {
+//       snapId: defaultSnapOrigin,
+//       request: { method: 'downloadFromIPFS', params: [cid] },
+//     },
+//   });
+// };
 
-export const uploadToIPFS = async (encryptedData: string) => {
-  await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: { method: 'uploadToIPFS', params: [encryptedData] },
-    },
-  });
-};
-
-export const downloadFromIPFS = async (cid: string) => {
-  await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: { method: 'downloadFromIPFS', params: [cid] },
-    },
-  });
-};
-
-export const updateIPFS = async (cid: string, data: string) => {
-  await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: { method: 'updateIPFS', params: [cid, data] },
-    },
-  });
-};
-
-export const encryptWithOtherSnap = async (_data: Record<string, unknown>) => {
-  // await window.ethereum.request({
-  //   method: 'wallet_invokeSnap',
-  //   params: {
-  //     snapId: defaultOtherSnapOrigin,
-  //     request: { method: 'encryptWithOtherSnap', params: [data] },
-  //   },
-  // });
-};
+// export const updateIPFS = async (cid: string, data: string) => {
+//   await window.ethereum.request({
+//     method: 'wallet_invokeSnap',
+//     params: {
+//       snapId: defaultSnapOrigin,
+//       request: { method: 'updateIPFS', params: [cid, data] },
+//     },
+//   });
+// };
 
 export const getGlobalState = async () => {
   await window.ethereum.request({
@@ -166,3 +135,28 @@ export const getIPFSList = async (): Promise<IPFS[]> => {
 };
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
+
+export const getAPIKey = async (snapId: string) => {
+  const response = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId,
+      request: { method: 'get_api_key' },
+    },
+  });
+
+  return response as { apiKey: string };
+};
+
+export const saveAPIKey = async (
+  snapId: string,
+  apiKey: string,
+): Promise<void> => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId,
+      request: { method: 'save_api_key', params: { apiKey } },
+    },
+  });
+};

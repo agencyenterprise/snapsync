@@ -1,15 +1,25 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import {
   Card,
+  CardDescription,
+  CardTitle,
+  CardWrapper,
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext, MetamaskActions } from '../hooks';
-import { connectSnap, getSnap, shouldDisplayReconnectButton } from '../utils';
+import {
+  connectSnap,
+  getAPIKey,
+  getSnap,
+  saveAPIKey,
+  shouldDisplayReconnectButton,
+} from '../utils';
+import { Input } from '../components/Input';
 
 const Container = styled.div`
   display: flex;
@@ -38,12 +48,13 @@ const Span = styled.span`
 `;
 
 const CardContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   flex-direction: column;
   flex-wrap: wrap;
-  justify-content: space-between;
-  max-width: 64.8rem;
+  max-width: 80rem;
   gap: 2.4rem;
+  justify-content: space-between;
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
@@ -54,6 +65,7 @@ const ErrorMessage = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.error.default};
   color: ${({ theme }) => theme.colors.error.alternative};
   border-radius: ${({ theme }) => theme.radii.default};
+  grid-column: 1 / 1;
   padding: 2.4rem;
   margin-bottom: 2.4rem;
   margin-top: 2.4rem;
@@ -69,6 +81,19 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [apiKey, setApiKey] = useState('');
+
+  // Load saved API key if connected
+  useEffect(() => {
+    if (state.installedSnap) {
+      getAPIKey(state.installedSnap.id)
+        .then((r) => setApiKey(r.apiKey))
+        .catch((e) => {
+          console.error(e);
+          dispatch({ type: MetamaskActions.SetError, payload: e });
+        });
+    }
+  }, [state.installedSnap]);
 
   const handleConnectClick = async () => {
     try {
@@ -82,6 +107,19 @@ const Index = () => {
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  // Update UI when API key changes and save it in the snap
+  const handleKeyChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setApiKey(e.target.value);
+    if (state.installedSnap) {
+      try {
+        await saveAPIKey(state.installedSnap.id, e.target.value);
+      } catch (e) {
+        console.error(e);
+        dispatch({ type: MetamaskActions.SetError, payload: e });
+      }
     }
   };
 
@@ -143,96 +181,19 @@ const Index = () => {
           />
         )}
 
-        {/* <CardGroup>
-          {!state.otherSnapInstalled && (
-            <Card
-              content={{
-                title: 'Connect State Snap',
-                description: 'Get started by connecting state snap.',
-                button: (
-                  <ConnectButton
-                    onClick={handleConnectOtherClick}
-                    disabled={!state.isFlask}
-                  />
-                ),
-              }}
-              disabled={!state.isFlask}
-            />
-          )}
-          {shouldDisplayReconnectButton(state.otherSnapInstalled) && (
-            <Card
-              content={{
-                title: 'Reconnect State Snap',
-                description:
-                  'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
-                button: (
-                  <ReconnectButton
-                    onClick={handleConnectOtherClick}
-                    disabled={!state.otherSnapInstalled}
-                  />
-                ),
-              }}
-              disabled={!state.otherSnapInstalled}
-            />
-          )}
-          <Card
-            content={{
-              title: 'Send handleSaveState Message',
-              description:
-                'Display a custom message within a confirmation screen in MetaMask.',
-              button: (
-                <SendMessageButton
-                  onClick={handleSaveState}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
+        <CardWrapper disabled={!state.installedSnap}>
+          <CardTitle>Add your Piñata Key</CardTitle>
+          <CardDescription>
+            The snap needs an API key to connect to your Piñata account and save
+            your data.
+          </CardDescription>
+          <Input
+            type="password"
+            placeholder="Your Piñata key"
+            value={apiKey}
+            onChange={handleKeyChanged}
           />
-          <Card
-            content={{
-              title: 'Send handleGetState Message',
-              description:
-                'Display a custom message within a confirmation screen in MetaMask.',
-              button: (
-                <SendMessageButton
-                  onClick={handleGetState}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          <Card
-            content={{
-              title: 'Send handleClearState Message',
-              description:
-                'Display a custom message within a confirmation screen in MetaMask.',
-              button: (
-                <SendMessageButton
-                  onClick={handleClearState}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        </CardGroup> */}
+        </CardWrapper>
       </CardContainer>
     </Container>
   );
