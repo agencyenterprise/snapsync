@@ -1,29 +1,15 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
+
 import {
   Card,
   ConnectButton,
   InstallFlaskButton,
-  NavigationButton,
   ReconnectButton,
-  SendMessageButton,
 } from '../components';
-import { defaultOtherSnapOrigin, defaultSnapOrigin } from '../config';
+import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext, MetamaskActions } from '../hooks';
-import {
-  connectSnap,
-  dencrypt,
-  downloadFromIPFS,
-  encrypt,
-  getGlobalState,
-  getSnap,
-  sendClearState,
-  sendGetState,
-  sendSaveState,
-  shouldDisplayReconnectButton,
-  updateIPFS,
-  uploadToIPFS,
-} from '../utils';
+import { connectSnap, getSnap, shouldDisplayReconnectButton } from '../utils';
 
 const Container = styled.div`
   display: flex;
@@ -51,16 +37,6 @@ const Span = styled.span`
   color: ${(props) => props.theme.colors.primary.default};
 `;
 
-const Subtitle = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.large};
-  font-weight: 500;
-  margin-top: 0;
-  margin-bottom: 0;
-  ${({ theme }) => theme.mediaQueries.small} {
-    font-size: ${({ theme }) => theme.fontSizes.text};
-  }
-`;
-
 const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -71,36 +47,6 @@ const CardContainer = styled.div`
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
-`;
-
-const CardGroup = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 0 1.2rem;
-  border-radius: ${({ theme }) => theme.radii.default};
-  border: 1px solid ${({ theme }) => theme.colors.border.default};
-`;
-
-const Notice = styled.div`
-  background-color: ${({ theme }) => theme.colors.background.alternative};
-  border: 1px solid ${({ theme }) => theme.colors.border.default};
-  color: ${({ theme }) => theme.colors.text.alternative};
-  border-radius: ${({ theme }) => theme.radii.default};
-  padding: 2.4rem;
-  margin-top: 2.4rem;
-  max-width: 60rem;
-  width: 100%;
-
-  & > * {
-    margin: 0;
-  }
-  ${({ theme }) => theme.mediaQueries.small} {
-    margin-top: 1.2rem;
-    padding: 1.6rem;
-  }
 `;
 
 const ErrorMessage = styled.div`
@@ -123,10 +69,6 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-  const [toIPFS, setToIPFS] = useState('');
-  const [fromIPFS, setFromIPFS] = useState('');
-  const [toEncrypt, setToEncrypt] = useState('');
-  const [toDecrypt, setToDecrypt] = useState('');
 
   const handleConnectClick = async () => {
     try {
@@ -143,122 +85,19 @@ const Index = () => {
     }
   };
 
-  const handleConnectOtherClick = async () => {
-    try {
-      await connectSnap(defaultOtherSnapOrigin);
-      const installedSnap = await getSnap(defaultOtherSnapOrigin);
-
-      dispatch({
-        type: MetamaskActions.SetOtherSnapInstalled,
-        payload: installedSnap,
-      });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleSaveState = async () => {
-    try {
-      await sendSaveState({ foo: 'bar' });
-      console.log('data stored');
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleGetState = async () => {
-    try {
-      const data = await sendGetState();
-      console.log('current state:', data);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleClearState = async () => {
-    try {
-      await sendClearState();
-      console.log('state cleared');
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleGetSyncSnapState = async () => {
-    try {
-      await getGlobalState();
-    } catch (error) {
-      console.error(error);
-      dispatch({ type: MetamaskActions.SetError, payload: error });
-    }
-  };
-
-  const handleEncryptClick = async () => {
-    try {
-      await encrypt({ toEncrypt });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleDencryptClick = async () => {
-    try {
-      await dencrypt(toDecrypt);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleUploadString = async () => {
-    try {
-      await uploadToIPFS(toIPFS);
-      console.log('data uploaded');
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleDownloadString = async () => {
-    try {
-      await downloadFromIPFS(fromIPFS);
-      console.log('data downloaded');
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleUpdateString = async () => {
-    try {
-      await updateIPFS(fromIPFS, toIPFS);
-      console.log('data downloaded');
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
   return (
     <Container>
       <Heading>
-        Import / Export your data to <Span>IPFS</Span>
+        Set up your <Span>IPFS</Span> connection
       </Heading>
-      <CardContainer>
-        <NavigationButton href="/dashboard">Dashboard</NavigationButton>
-      </CardContainer>
+
       <CardContainer>
         {state.error && (
           <ErrorMessage>
             <b>An error happened:</b> {state.error.message}
           </ErrorMessage>
         )}
+
         {!state.isFlask && (
           <Card
             content={{
@@ -271,7 +110,40 @@ const Index = () => {
           />
         )}
 
-        <CardGroup>
+        {!state.installedSnap && (
+          <Card
+            content={{
+              title: 'Connect',
+              description: 'Get started by connecting MetaMask to the snap.',
+              button: (
+                <ConnectButton
+                  onClick={handleConnectClick}
+                  disabled={!state.isFlask}
+                />
+              ),
+            }}
+            disabled={!state.isFlask}
+          />
+        )}
+
+        {shouldDisplayReconnectButton(state.installedSnap) && (
+          <Card
+            content={{
+              title: 'Reconnect',
+              description:
+                'Reconnect to the snap to update to the latest version.',
+              button: (
+                <ReconnectButton
+                  onClick={handleConnectClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+          />
+        )}
+
+        {/* <CardGroup>
           {!state.otherSnapInstalled && (
             <Card
               content={{
@@ -360,287 +232,7 @@ const Index = () => {
               !shouldDisplayReconnectButton(state.installedSnap)
             }
           />
-        </CardGroup>
-        <CardGroup>
-          {!state.installedSnap && (
-            <Card
-              content={{
-                title: 'Connect Sync Snap',
-                description: 'Get started by connecting sync snap',
-                button: (
-                  <ConnectButton
-                    onClick={handleConnectClick}
-                    disabled={!state.isFlask}
-                  />
-                ),
-              }}
-              disabled={!state.isFlask}
-            />
-          )}
-
-          <Card
-            content={{
-              title: 'Encrypt Data',
-              description: (
-                <div>
-                  <p>Encrypt data using the snap.</p>
-                  <input
-                    type="text"
-                    placeholder="String to encrypt"
-                    defaultValue={toEncrypt}
-                    onChange={(e) => {
-                      setToEncrypt(e.target.value);
-                    }}
-                  />
-                </div>
-              ),
-              button: (
-                <SendMessageButton
-                  onClick={handleEncryptClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          <Card
-            content={{
-              title: 'Decrypt Data',
-              description: (
-                <div>
-                  <p>Decrypt string</p>
-                  <input
-                    type="text"
-                    placeholder="String to decrypt"
-                    defaultValue={toDecrypt}
-                    onChange={(e) => {
-                      setToDecrypt(e.target.value);
-                    }}
-                  />
-                </div>
-              ),
-              button: (
-                <SendMessageButton
-                  onClick={handleDencryptClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          {shouldDisplayReconnectButton(state.installedSnap) && (
-            <Card
-              content={{
-                title: 'Reconnect Sync Snap',
-                description:
-                  'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
-                button: (
-                  <ReconnectButton
-                    onClick={handleConnectClick}
-                    disabled={!state.installedSnap}
-                  />
-                ),
-              }}
-              disabled={!state.installedSnap}
-            />
-          )}
-
-          <Card
-            content={{
-              title: 'Get State',
-              description: 'Try to get state from other snaps.',
-              button: (
-                <SendMessageButton
-                  onClick={handleGetSyncSnapState}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          <Card
-            content={{
-              title: 'Encrypt Data',
-              description: (
-                <div>
-                  <p>Encrypt data using the snap.</p>
-                  <input
-                    type="text"
-                    placeholder="String to encrypt"
-                    defaultValue={toEncrypt}
-                    onChange={(e) => {
-                      setToEncrypt(e.target.value);
-                    }}
-                  />
-                </div>
-              ),
-              button: (
-                <SendMessageButton
-                  onClick={handleEncryptClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          <Card
-            content={{
-              title: 'Decrypt Data',
-              description: (
-                <div>
-                  <p>Decrypt string</p>
-                  <input
-                    type="text"
-                    placeholder="String to decrypt"
-                    defaultValue={toDecrypt}
-                    onChange={(e) => {
-                      setToDecrypt(e.target.value);
-                    }}
-                  />
-                </div>
-              ),
-              button: (
-                <SendMessageButton
-                  onClick={handleDencryptClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          <Card
-            content={{
-              title: 'Upload to IPFS',
-              description: (
-                <div>
-                  <p>Upload string to IPFS and returns the CID</p>
-                  <input
-                    type="text"
-                    placeholder="String to upload to IPFS"
-                    defaultValue={toIPFS}
-                    onChange={(e) => {
-                      setToIPFS(e.target.value);
-                    }}
-                  />
-                </div>
-              ),
-              button: (
-                <SendMessageButton
-                  onClick={handleUploadString}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          <Card
-            content={{
-              title: 'Download from IPFS',
-              description: (
-                <div>
-                  <p>Get encrypted string from IPFS using the CID</p>
-                  <input
-                    type="text"
-                    placeholder="CID"
-                    defaultValue={fromIPFS}
-                    onChange={(e) => {
-                      setFromIPFS(e.target.value);
-                    }}
-                  />
-                </div>
-              ),
-              button: (
-                <SendMessageButton
-                  onClick={handleDownloadString}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-          <Card
-            content={{
-              title: 'Update data on IPFS',
-              description: (
-                <div>
-                  <p>Get encrypted string from IPFS using the CID</p>
-                  <input
-                    type="text"
-                    placeholder="New content"
-                    defaultValue={toIPFS}
-                    onChange={(e) => {
-                      setToIPFS(e.target.value);
-                    }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="CID"
-                    defaultValue={fromIPFS}
-                    onChange={(e) => {
-                      setFromIPFS(e.target.value);
-                    }}
-                  />
-                </div>
-              ),
-              button: (
-                <SendMessageButton
-                  onClick={handleUpdateString}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        </CardGroup>
-
-        <Notice>
-          <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
-          </p>
-        </Notice>
+        </CardGroup> */}
       </CardContainer>
     </Container>
   );

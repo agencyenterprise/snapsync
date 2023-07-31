@@ -1,4 +1,4 @@
-import { defaultOtherSnapOrigin, defaultSnapOrigin } from '../config';
+import { defaultSnapOrigin } from '../config';
 import { GetSnapsResponse, IPFS, Snap } from '../types';
 
 /**
@@ -54,34 +54,34 @@ export const getSnap = async (
   }
 };
 
-export const sendSaveState = async (data: object) => {
-  return window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultOtherSnapOrigin,
-      request: { method: 'saveState', params: { data } },
-    },
-  });
+export const sendSaveState = async (_data: object) => {
+  // return window.ethereum.request({
+  //   method: 'wallet_invokeSnap',
+  //   params: {
+  //     snapId: defaultOtherSnapOrigin,
+  //     request: { method: 'saveState', params: { data } },
+  //   },
+  // });
 };
 
 export const sendGetState = async () => {
-  return window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultOtherSnapOrigin,
-      request: { method: 'getState' },
-    },
-  });
+  // return window.ethereum.request({
+  //   method: 'wallet_invokeSnap',
+  //   params: {
+  //     snapId: defaultOtherSnapOrigin,
+  //     request: { method: 'getState' },
+  //   },
+  // });
 };
 
 export const sendClearState = async () => {
-  return window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultOtherSnapOrigin,
-      request: { method: 'clearState' },
-    },
-  });
+  // return window.ethereum.request({
+  //   method: 'wallet_invokeSnap',
+  //   params: {
+  //     snapId: defaultOtherSnapOrigin,
+  //     request: { method: 'clearState' },
+  //   },
+  // });
 };
 
 export const encrypt = async (data: Record<string, unknown>) => {
@@ -134,14 +134,14 @@ export const updateIPFS = async (cid: string, data: string) => {
   });
 };
 
-export const encryptWithOtherSnap = async (data: Record<string, unknown>) => {
-  await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultOtherSnapOrigin,
-      request: { method: 'encryptWithOtherSnap', params: [data] },
-    },
-  });
+export const encryptWithOtherSnap = async (_data: Record<string, unknown>) => {
+  // await window.ethereum.request({
+  //   method: 'wallet_invokeSnap',
+  //   params: {
+  //     snapId: defaultOtherSnapOrigin,
+  //     request: { method: 'encryptWithOtherSnap', params: [data] },
+  //   },
+  // });
 };
 
 export const getGlobalState = async () => {

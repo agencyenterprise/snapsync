@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
   "description": "Keep data synced between devices.",
-  "proposedName": "IPFS Sync Snap",
+  "proposedName": "IPFS Sync",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "ruiHMnB+M8CdMc+VvcZnR85NhQPY4kZT/A5GbOGCuT8=",
+    "shasum": "tseik6PwRtPdiHnkjQtJ0Pq4gkGFUUZZ5Aj6szwg5HY=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -23,12 +23,7 @@
       "dapps": true,
       "snaps": true
     },
-    "endowment:network-access": {},
-    "snap_getBip44Entropy": [
-      {
-        "coinType": 966
-      }
-    ]
+    "endowment:network-access": {}
   },
   "manifestVersion": "0.1"
 }
