@@ -6,7 +6,7 @@ import {
   useEffect,
   useReducer,
 } from 'react';
-import { defaultOtherSnapOrigin, defaultSnapOrigin } from '../config';
+import { defaultSnapOrigin } from '../config';
 import { Snap } from '../types';
 import { getSnap, isFlask } from '../utils';
 
@@ -100,11 +100,6 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
       dispatch({
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
-      });
-      const otherSnapInstalled = await getSnap(defaultOtherSnapOrigin);
-      dispatch({
-        type: MetamaskActions.SetOtherSnapInstalled,
-        payload: otherSnapInstalled,
       });
     }
 

@@ -1,17 +1,23 @@
-import { Json } from '@metamask/snaps-types';
+import type { Json } from '@metamask/snaps-types';
 
-export const saveState = async (newState: any): Promise<void> => {
+export type LocalState = {
+  apiKey?: string;
+};
+
+export const saveState = async (newState: LocalState): Promise<void> => {
   await snap.request({
     method: 'snap_manageState',
     params: { operation: 'update', newState },
   });
 };
 
-export const getState = async (): Promise<Record<string, Json> | null> => {
-  return snap.request({
+export const getState = async (): Promise<LocalState> => {
+  const state = snap.request({
     method: 'snap_manageState',
     params: { operation: 'get' },
   });
+
+  return (state as LocalState) || {};
 };
 
 export const clearState = async (): Promise<Record<string, Json> | null> => {

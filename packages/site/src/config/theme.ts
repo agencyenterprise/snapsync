@@ -20,7 +20,7 @@ const theme = {
     small: '1.4rem',
   },
   radii: {
-    default: '24px',
+    default: '16px',
     button: '8px',
   },
   breakpoints,
