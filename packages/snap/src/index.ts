@@ -3,6 +3,7 @@ import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { getState, saveState } from './storage/local';
 import { stringToHex } from './utils/string';
 import { PinataIPFSService } from './ipfs/service';
+import { isSnapDapp } from './utils/snap';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -19,11 +20,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
 }) => {
   switch (request.method) {
-    // TODO Verify that the snap is the one that invoked the request. Others snaps should not be able to invoke this snap's methods.
     case 'get_api_key':
+      verifyIsSnapDapp(origin);
       return handleGetAPIKey();
 
     case 'save_api_key':
+      verifyIsSnapDapp(origin);
       return handleSaveAPIKey((request.params as { apiKey: string }).apiKey);
 
     case 'get':
@@ -39,6 +41,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       throw new Error('Method not found.');
   }
 };
+
+/**
+ * Verify that the origin is the snap dapp.
+ *
+ * @param origin - The origin to check.
+ */
+function verifyIsSnapDapp(origin: string): void {
+  if (!isSnapDapp(origin)) {
+    throw new Error('You are not allowed to invoke this method.');
+  }
+}
 
 /**
  * Returns the pinata key from managed state.
