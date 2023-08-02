@@ -1,6 +1,6 @@
 {
   "name": "metamask-ipfs-sync-snap",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "IPFS synchronization MetaMask snap.",
   "repository": {
     "type": "git",

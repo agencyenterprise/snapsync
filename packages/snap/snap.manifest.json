@@ -1,5 +1,5 @@
 {
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Keep data synced between devices.",
   "proposedName": "IPFS Sync",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "tIhYjFWRIdc7S2RTd6nxwuXYsMX9RyzqGTjSLChntX0=",
+    "shasum": "OpnEGhAw4o/B6pnwHoqjwem8OgxNrsRkVPL1oMRhPLE=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
