@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Keep data synced between devices.",
   "proposedName": "IPFS Sync",
   "repository": {

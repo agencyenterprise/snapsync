@@ -21,11 +21,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   switch (request.method) {
     case 'get_api_key':
-      verifyIsSnapDapp(origin);
+      // verifyIsSnapDapp(origin);
       return handleGetAPIKey();
 
     case 'save_api_key':
-      verifyIsSnapDapp(origin);
+      // verifyIsSnapDapp(origin);
       return handleSaveAPIKey((request.params as { apiKey: string }).apiKey);
 
     case 'get':
@@ -91,7 +91,11 @@ async function handleGet(snapId: string): Promise<unknown> {
  */
 async function handleSave(snapId: string, snapState: unknown): Promise<void> {
   const encodedId = stringToHex(snapId);
-  await PinataIPFSService.instance.set(encodedId, snapState);
+  await PinataIPFSService.instance.set(encodedId, {
+    ...snapState,
+    snapId,
+    encodedId,
+  });
 }
 
 /**

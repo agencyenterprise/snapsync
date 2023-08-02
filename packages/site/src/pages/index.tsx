@@ -103,21 +103,20 @@ const Index = () => {
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
 
-    if (state.installedSnap) {
+    if (state.installedSnap && apiKey) {
       // clearState(state.installedSnap.id)
       //   .then(() => console.log('Clean! 🧹'))
       //   .catch(handleError);
       // getPersistedState(state.installedSnap.id)
       //   .then((r) => console.log(r))
       //   .catch(handleError);
-      // persistState(state.installedSnap.id, {
-      //   firstName: 'Daniel',
-      //   surname: 'Cruz',
-      // })
-      //   .then(() => console.log('Success! 🚀'))
-      //   .catch(handleError);
+      persistState(state.installedSnap.id, {
+        timestamp: new Date().toISOString(),
+      })
+        .then(() => console.log('Success! 🚀'))
+        .catch(handleError);
     }
-  }, [state.installedSnap]);
+  }, [state.installedSnap, apiKey]);
 
   const handleConnectClick = async () => {
     try {
