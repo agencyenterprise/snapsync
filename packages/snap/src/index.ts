@@ -1,5 +1,6 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 
+import { heading, panel, text } from '@metamask/snaps-ui';
 import { getState, saveState } from './storage/local';
 import { stringToHex } from './utils/string';
 import { PinataIPFSService } from './ipfs/service';
@@ -27,6 +28,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'save_api_key':
       verifyIsSnapDapp(origin);
       return handleSaveAPIKey((request.params as { apiKey: string }).apiKey);
+
+    case 'has_api_key':
+      return Boolean((await getState())?.apiKey);
+
+    case 'dialog_api_key':
+      return dialogSaveAPIKey();
 
     case 'get':
       return handleGet(origin);
@@ -71,6 +78,26 @@ async function handleGetAPIKey(): Promise<{ apiKey: string }> {
 async function handleSaveAPIKey(apiKey: string): Promise<void> {
   const state = await getState();
   await saveState({ ...state, apiKey });
+}
+
+/**
+ * Prompt the user to save the pinata key.
+ */
+async function dialogSaveAPIKey(): Promise<void> {
+  const input = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: panel([
+        heading('Want to update your piñata JWT?'),
+        text('Add your new piñata JWT:'),
+      ]),
+    },
+  });
+  if (input && typeof input === 'string') {
+    return await handleSaveAPIKey(input.trim());
+  }
+  throw new Error('No input provided.');
 }
 
 /**
