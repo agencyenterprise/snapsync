@@ -1,5 +1,5 @@
 import { defaultSnapOrigin } from '../config';
-import { GetSnapsResponse, Snap } from '../types';
+import { GetSnapsResponse, Snap, ApiKeys } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -71,16 +71,16 @@ export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
  * @param syncSnapId - The ID of the sync snap.
  * @returns Saved API key content.
  */
-export const getAPIKey = async (syncSnapId: string) => {
+export const getAPIKeys = async (syncSnapId: string) => {
   const response = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: syncSnapId,
-      request: { method: 'get_api_key' },
+      request: { method: 'get_api_keys' },
     },
   });
 
-  return response as { apiKey: string };
+  return response as { apiKeys: ApiKeys };
 };
 
 /**
