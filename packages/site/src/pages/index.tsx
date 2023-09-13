@@ -10,6 +10,8 @@ import {
   InstallFlaskButton,
   ReconnectButton,
   Input,
+  HowItWorks,
+  ForDevelopers,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext, MetamaskActions } from '../hooks';
@@ -24,13 +26,23 @@ import {
   shouldDisplayReconnectButton,
 } from '../utils';
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  ${({ theme }) => theme.mediaQueries.small} {
+    flex-direction: column;
+  }
+`;
+
 const Container = styled.div`
+  background-color: ${({ theme }) => theme.colors.background.alternative};
   display: flex;
   flex-direction: column;
-  align-items: center;
   flex: 1;
-  margin-top: 7.6rem;
-  margin-bottom: 7.6rem;
+  padding-left: 64px;
+  padding-top: 280px;
+  padding-bottom: 280px;
   ${({ theme }) => theme.mediaQueries.small} {
     padding-left: 2.4rem;
     padding-right: 2.4rem;
@@ -41,9 +53,15 @@ const Container = styled.div`
 `;
 
 const Heading = styled.h1`
-  margin-top: 0;
+  margin-top: 4rem;
   margin-bottom: 2.4rem;
-  text-align: center;
+  font-weight: 900;
+`;
+
+const HeroDescription = styled.p`
+  margin-top: 0;
+  font-weight: 400;
+  font-size: 2.6rem;
 `;
 
 const Span = styled.span`
@@ -147,11 +165,38 @@ const Index = () => {
   };
 
   return (
-    <Container>
-      <Heading>
-        Set up your <Span>IPFS</Span> connection
-      </Heading>
-
+    <>
+      <Wrapper>
+        <Container>
+          <Heading>Sync Metamask Snaps Across Devices.</Heading>
+          <HeroDescription>
+            <Span>SnapSync</Span> is a
+            <Span>
+              {' '}
+              <a href="https://metamask.io/snaps/" target="_blank">
+                Metamask Snap
+              </a>
+            </Span>{' '}
+            that saves data from snaps across devices securely using IPFS.
+          </HeroDescription>
+          <ConnectButton
+            onClick={handleConnectClick}
+            disabled={!state.isFlask}
+          />
+        </Container>
+        <Container>
+          <iframe
+            width="640"
+            height="380"
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=xkqlG1wxEpQWLXfE"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </Container>
+      </Wrapper>
+      <HowItWorks />
       <CardContainer>
         {state.error && (
           <ErrorMessage>
@@ -218,7 +263,8 @@ const Index = () => {
           />
         </CardWrapper>
       </CardContainer>
-    </Container>
+      <ForDevelopers />
+    </>
   );
 };
 

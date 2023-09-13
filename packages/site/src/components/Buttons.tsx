@@ -37,7 +37,7 @@ export const Button = styled.button`
   align-self: flex-start;
   align-items: center;
   justify-content: center;
-  margin-top: auto;
+  font-size: ${(props) => props.theme.fontSizes.large};
   ${({ theme }) => theme.mediaQueries.small} {
     width: 100%;
   }
@@ -84,7 +84,7 @@ export const ConnectButton = (props: ComponentProps<typeof Button>) => {
   return (
     <Button {...props}>
       <FlaskFox />
-      <ButtonText>Connect</ButtonText>
+      <ButtonText>Try It</ButtonText>
     </Button>
   );
 };

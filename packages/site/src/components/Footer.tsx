@@ -5,12 +5,11 @@ import { PoweredBy } from './PoweredBy';
 
 const FooterWrapper = styled.footer`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding-top: 2.4rem;
   padding-bottom: 2.4rem;
-  border-top: 1px solid ${(props) => props.theme.colors.border.default};
 `;
 
 const PoweredByButton = styled.a`
@@ -21,7 +20,7 @@ const PoweredByButton = styled.a`
   padding: 1.2rem;
   border-radius: ${({ theme }) => theme.radii.button};
   box-shadow: ${({ theme }) => theme.shadows.button};
-  background-color: ${({ theme }) => theme.colors.background.alternative};
+  background-color: ${({ theme }) => theme.colors.background.default};
 `;
 
 const PoweredByContainer = styled.div`
@@ -35,6 +34,9 @@ export const Footer = () => {
 
   return (
     <FooterWrapper>
+      <p>
+        Made with ❤️ by <a href="https://ae.studio">AE Studio</a>
+      </p>
       <PoweredByButton href="https://docs.metamask.io/" target="_blank">
         <MetaMaskFox />
         <PoweredByContainer>

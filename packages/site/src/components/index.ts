@@ -7,3 +7,5 @@ export * from './PoweredBy';
 export * from './SnapLogo';
 export * from './Toggle';
 export * from './Input';
+export * from './HowItWorks';
+export * from './ForDevelopers';
