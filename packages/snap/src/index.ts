@@ -1,6 +1,6 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 
-import { divider, heading, panel, text, copyable } from '@metamask/snaps-ui';
+import { heading, panel, text } from '@metamask/snaps-ui';
 import { getState, saveState } from './storage/local';
 import { stringToHex } from './utils/string';
 import { PinataIPFSService } from './ipfs/service';
@@ -115,22 +115,23 @@ async function handleSaveAPIKey(
  * Prompt the user to save the pinata key.
  */
 async function dialogSaveAPIKey(): Promise<void> {
-  const provider = await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'prompt',
-      content: panel([
-        heading('Select your IPFS provider to use SnapSync.'),
-        divider(),
-        copyable('Pinata'),
-        copyable('Infura'),
-        text('Type or paste in the provider name.'),
-      ]),
-    },
-  });
+  // const provider = await snap.request({
+  //   method: 'snap_dialog',
+  //   params: {
+  //     type: 'prompt',
+  //     content: panel([
+  //       heading('Select your IPFS provider to use SnapSync.'),
+  //       divider(),
+  //       copyable('Pinata'),
+  //       // copyable('Infura'),
+  //       text('Type or paste in the provider name.'),
+  //     ]),
+  //   },
+  // });
 
+  const provider = 'Pinata';
   const validProviders: { [key: string]: string } = {
-    pinata: 'Enter your pinata JWT',
+    pinata: 'Enter your Piñata JWT token',
     infura: 'Enter your Infura API key in the format API_KEY:API_SECRET',
   };
 

@@ -155,3 +155,13 @@ export const clearState = async (syncSnapId: string) => {
     },
   });
 };
+
+export const showSnapDialog = async (snapId: string) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId,
+      request: { method: 'dialog_api_key' },
+    },
+  });
+};
