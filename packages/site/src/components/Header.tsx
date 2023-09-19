@@ -42,17 +42,22 @@ export const Header = ({
   const theme = useTheme();
 
   return (
-    <HeaderWrapper>
-      <LogoWrapper>
-        <SnapLogo color={theme.colors.icon.default} size={36} />
-        <Title>SnapSync</Title>
-      </LogoWrapper>
-      <RightContainer>
-        <Toggle
-          onToggle={handleToggleClick}
-          defaultChecked={getThemePreference()}
-        />
-      </RightContainer>
-    </HeaderWrapper>
+    <>
+      <head>
+        <title>SnapSync</title>
+      </head>
+      <HeaderWrapper>
+        <LogoWrapper>
+          <SnapLogo color={theme.colors.icon.default} size={36} />
+          <Title>SnapSync</Title>
+        </LogoWrapper>
+        <RightContainer>
+          <Toggle
+            onToggle={handleToggleClick}
+            defaultChecked={getThemePreference()}
+          />
+        </RightContainer>
+      </HeaderWrapper>
+    </>
   );
 };
