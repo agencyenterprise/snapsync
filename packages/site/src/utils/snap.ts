@@ -88,12 +88,10 @@ export const getAPIKeys = async (syncSnapId: string) => {
  *
  * @param syncSnapId - The ID of the sync snap.
  * @param apiKey - The API key to save.
- * @param provider - IPFS provider.
  */
 export const saveAPIKey = async (
   syncSnapId: string,
   apiKey: string,
-  provider: string,
 ): Promise<void> => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -101,7 +99,7 @@ export const saveAPIKey = async (
       snapId: syncSnapId,
       request: {
         method: 'save_api_key',
-        params: { apiKey, provider },
+        params: { apiKey },
       },
     },
   });

@@ -27,17 +27,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'save_api_key': {
       verifyIsSnapDapp(origin);
-      const { apiKey, provider: providerSave } = request.params as {
-        apiKey: string;
-        provider: 'infura' | 'pinata';
-      };
-      return handleSaveAPIKey(providerSave, apiKey);
+      const { apiKey } = request.params as { apiKey: string };
+      return handleSaveAPIKey(apiKey);
     }
 
     case 'has_api_key': {
-      const providerHas = (request.params as { provider: 'infura' | 'pinata' })
-        .provider;
-      return Boolean((await getState()).apiKeys?.[providerHas]);
+      return Boolean((await getState()).apiKeys?.pinata);
     }
 
     case 'dialog_api_key':
@@ -81,15 +76,12 @@ async function handleGetAPIKeys(): Promise<Record<string, string>> {
 /**
  * Save the provider key to managed state.
  *
- * @param provider - the provider to get the key for.
  * @param apiKey - The key to save.
  */
-async function handleSaveAPIKey(
-  provider: 'infura' | 'pinata',
-  apiKey: string,
-): Promise<void> {
+async function handleSaveAPIKey(apiKey: string): Promise<void> {
   const state = await getState();
-  const apiKeys = { ...state.apiKeys, [provider]: apiKey };
+  const apiKeys = { ...state.apiKeys, pinata: apiKey };
+
   await saveState({ apiKeys });
 }
 
@@ -97,48 +89,19 @@ async function handleSaveAPIKey(
  * Prompt the user to save the pinata key.
  */
 async function dialogSaveAPIKey(): Promise<void> {
-  // const provider = await snap.request({
-  //   method: 'snap_dialog',
-  //   params: {
-  //     type: 'prompt',
-  //     content: panel([
-  //       heading('Select your IPFS provider to use SnapSync.'),
-  //       divider(),
-  //       copyable('Pinata'),
-  //       // copyable('Infura'),
-  //       text('Type or paste in the provider name.'),
-  //     ]),
-  //   },
-  // });
+  const ipfsKey = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: panel([
+        heading('Enter your Piñata JWT token'),
+        text('Enter your key below:'),
+      ]),
+    },
+  });
 
-  const provider = 'Pinata';
-  const validProviders: { [key: string]: string } = {
-    pinata: 'Enter your Piñata JWT token',
-    infura: 'Enter your Infura API key in the format API_KEY:API_SECRET',
-  };
-
-  if (typeof provider === 'string') {
-    const lowerProvider = provider.toLowerCase();
-
-    if (validProviders[lowerProvider]) {
-      const ipfsKey = await snap.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'prompt',
-          content: panel([
-            heading(validProviders[lowerProvider]),
-            text('Enter your key below:'),
-          ]),
-        },
-      });
-
-      if (ipfsKey && typeof ipfsKey === 'string') {
-        return await handleSaveAPIKey(
-          lowerProvider as 'infura' | 'pinata',
-          ipfsKey.trim(),
-        );
-      }
-    }
+  if (ipfsKey && typeof ipfsKey === 'string') {
+    return await handleSaveAPIKey(ipfsKey.trim());
   }
 
   throw new Error('No input provided.');

@@ -120,14 +120,11 @@ const Index = () => {
   };
 
   // Update UI when API key changes and save it in the snap
-  const handleKeyChanged = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    provider: string,
-  ) => {
+  const handleKeyChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (state.installedSnap) {
       try {
         const key = e.target.value;
-        await saveAPIKey(state.installedSnap.id, key, provider);
+        await saveAPIKey(state.installedSnap.id, key);
 
         if (key.length) {
           await persistExampleState();
@@ -207,7 +204,7 @@ const Index = () => {
             id="pinata-key"
             type="password"
             placeholder="Piñata JWT"
-            onChange={(e) => handleKeyChanged(e, 'pinata')}
+            onChange={handleKeyChanged}
           />
         </CardWrapper>
       </CardContainer>
