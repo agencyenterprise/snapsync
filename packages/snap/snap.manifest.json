@@ -1,18 +1,18 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.3",
   "description": "Keep data synced between devices.",
   "proposedName": "SnapSync",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/agencyenterprise/snapsync"
   },
   "source": {
-    "shasum": "sVhS+ZDLr65OyMQ9orQbJ2XHq0rAoJa8MASR8JMEl70=",
+    "shasum": "GQ5JBbG6kZKr5LDBcdlGzKF4uteQ5ORuCUSfHwYyigM=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "@aestudio/syncsnap",
+        "packageName": "@ae-studio/snapsync",
         "registry": "https://registry.npmjs.org/"
       }
     }

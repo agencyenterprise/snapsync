@@ -5,9 +5,9 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@aestudio/syncsnap@workspace:packages/snap":
+"@ae-studio/snapsync@workspace:packages/snap":
   version: 0.0.0-use.local
-  resolution: "@aestudio/syncsnap@workspace:packages/snap"
+  resolution: "@ae-studio/snapsync@workspace:packages/snap"
   dependencies:
     "@lavamoat/allow-scripts": ^2.0.3
     "@metamask/auto-changelog": ^2.6.0
