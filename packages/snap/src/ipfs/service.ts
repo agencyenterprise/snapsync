@@ -41,7 +41,7 @@ export class PinataIPFSService {
    * @param snapId - The id of the snap.
    * @returns The hash of the snap state, or null if not found.
    */
-  private async getHash(snapId: string): Promise<string | null> {
+  private async getHashes(snapId: string): Promise<string[]> {
     const url = `${config.pinataUrl}/data/pinList?status=pinned&metadata[name]=snap-${snapId}`;
     const response = await fetch(url, {
       method: 'GET',
@@ -53,10 +53,10 @@ export class PinataIPFSService {
 
     const data = (await response.json()) as PinListResponse;
     if (!response.ok || data.rows.length === 0) {
-      return null;
+      return [];
     }
 
-    return data.rows[0].ipfs_pin_hash;
+    return data.rows.map((row) => row.ipfs_pin_hash);
   }
 
   /**
@@ -66,7 +66,7 @@ export class PinataIPFSService {
    * @returns The state of the snap, or null if not found.
    */
   async get(snapId: string): Promise<unknown | null> {
-    const hash = await this.getHash(snapId);
+    const [hash] = await this.getHashes(snapId);
     if (!hash) {
       return null;
     }
@@ -96,7 +96,10 @@ export class PinataIPFSService {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete hash.');
+      const error = await response.json();
+      if (error?.error?.reason !== 'CURRENT_USER_HAS_NOT_PINNED_CID') {
+        throw new Error(`Failed to delete hash. ${JSON.stringify(error)}`);
+      }
     }
   }
 
@@ -106,12 +109,10 @@ export class PinataIPFSService {
    * @param snapId - The ID of the snap.
    */
   async delete(snapId: string): Promise<void> {
-    const hash = await this.getHash(snapId);
-    if (!hash) {
-      return;
+    const hashes = await this.getHashes(snapId);
+    if (hashes.length) {
+      await Promise.all(hashes.map((hash) => this.deleteHash(hash)));
     }
-
-    await this.deleteHash(hash);
   }
 
   /**
@@ -122,7 +123,7 @@ export class PinataIPFSService {
    */
   async set(snapId: string, data: unknown): Promise<void> {
     // Get current hash to delete in the end when succeeds
-    const currentHash = await this.getHash(snapId);
+    const currentHashes = await this.getHashes(snapId);
 
     // Save new state
     const response = await fetch(`${config.pinataUrl}/pinning/pinJSONToIPFS`, {
@@ -142,8 +143,8 @@ export class PinataIPFSService {
     }
 
     // Delete old state
-    if (currentHash) {
-      await this.deleteHash(currentHash);
+    if (currentHashes.length) {
+      await Promise.all(currentHashes.map((hash) => this.deleteHash(hash)));
     }
   }
 }

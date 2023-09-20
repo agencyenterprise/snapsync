@@ -17,6 +17,7 @@ import {
   connectSnap,
   getAPIKeys,
   getSnap,
+  persistExampleState,
   saveAPIKey,
   shouldDisplayReconnectButton,
 } from '../utils';
@@ -78,6 +79,8 @@ const ErrorMessage = styled.div`
   }
 `;
 
+export const Head = () => <title>SnapSync</title>;
+
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
@@ -91,6 +94,7 @@ const Index = () => {
               'pinata-key',
             ) as HTMLInputElement;
             input?.setAttribute('value', apiKeys.pinata);
+            persistExampleState();
           }
         })
         .catch((e) => {
@@ -122,7 +126,12 @@ const Index = () => {
   ) => {
     if (state.installedSnap) {
       try {
-        await saveAPIKey(state.installedSnap.id, e.target.value, provider);
+        const key = e.target.value;
+        await saveAPIKey(state.installedSnap.id, key, provider);
+
+        if (key.length) {
+          await persistExampleState();
+        }
       } catch (e) {
         console.error(e);
         dispatch({ type: MetamaskActions.SetError, payload: e });

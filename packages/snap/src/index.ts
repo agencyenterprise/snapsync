@@ -2,7 +2,6 @@ import { OnRpcRequestHandler } from '@metamask/snaps-types';
 
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { getState, saveState } from './storage/local';
-import { stringToHex } from './utils/string';
 import { PinataIPFSService } from './ipfs/service';
 import { isSnapDapp } from './utils/snap';
 
@@ -21,13 +20,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
 }) => {
   switch (request.method) {
-    case 'get_api_key': {
-      verifyIsSnapDapp(origin);
-      const providerGet = (request.params as { provider: 'infura' | 'pinata' })
-        .provider;
-      return handleGetAPIKey(providerGet);
-    }
-
     case 'get_api_keys': {
       verifyIsSnapDapp(origin);
       return handleGetAPIKeys();
@@ -47,6 +39,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         .provider;
       return Boolean((await getState()).apiKeys?.[providerHas]);
     }
+
     case 'dialog_api_key':
       return dialogSaveAPIKey();
 
@@ -83,17 +76,6 @@ function verifyIsSnapDapp(origin: string): void {
 async function handleGetAPIKeys(): Promise<Record<string, string>> {
   const state = await getState();
   return state.apiKeys || {};
-}
-
-/**
- * Returns a provider key from managed state.
- *
- * @param provider - the provider to get the key for.
- * @returns found key or empty if not found.
- */
-async function handleGetAPIKey(provider: 'infura' | 'pinata'): Promise<string> {
-  const state = await getState();
-  return state.apiKeys?.[provider] || '';
 }
 
 /**
@@ -168,8 +150,7 @@ async function dialogSaveAPIKey(): Promise<void> {
  * @param snapId - The snap ID.
  */
 async function handleGet(snapId: string): Promise<unknown> {
-  const encodedId = stringToHex(snapId);
-  return await PinataIPFSService.instance.get(encodedId);
+  return await PinataIPFSService.instance.get(snapId);
 }
 
 /**
@@ -179,8 +160,7 @@ async function handleGet(snapId: string): Promise<unknown> {
  * @param snapState - The snap state.
  */
 async function handleSave(snapId: string, snapState: unknown): Promise<void> {
-  const encodedId = stringToHex(snapId);
-  await PinataIPFSService.instance.set(encodedId, snapState);
+  await PinataIPFSService.instance.set(snapId, snapState);
 }
 
 /**
@@ -189,6 +169,5 @@ async function handleSave(snapId: string, snapState: unknown): Promise<void> {
  * @param snapId - The snap ID.
  */
 async function handleClear(snapId: string): Promise<void> {
-  const encodedId = stringToHex(snapId);
-  await PinataIPFSService.instance.delete(encodedId);
+  await PinataIPFSService.instance.delete(snapId);
 }

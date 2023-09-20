@@ -1,4 +1,5 @@
 // Origin of the app used to install and manage the snap dapp, running on port :8000 on development
+// TODO Load from environment variables
 const DAPP_SNAP_ORIGIN = ['http://localhost:8001'];
 // const DAPP_SNAP_ORIGIN = ['metamask-ipfs'];
 

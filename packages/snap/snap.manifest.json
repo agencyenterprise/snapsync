@@ -1,5 +1,5 @@
 {
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "Keep data synced between devices.",
   "proposedName": "SnapSync",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "KT9RJGqrrJ3l7kCMwszcAnRd9cqYhM1fq++7DLRo+F8=",
+    "shasum": "/UPm/PB+UKe6d5qedZ4le49uxS4SCOEzLZ25xoRMdfE=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

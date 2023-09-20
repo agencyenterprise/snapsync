@@ -141,6 +141,19 @@ export const persistState = async (
   });
 };
 
+export const persistExampleState = async () => {
+  try {
+    console.log('⌛ Persisting example state');
+    await persistState(defaultSnapOrigin, {
+      message: 'Hello from the sync snap!',
+      timestamp: Date.now(),
+    });
+    console.log('✅ Example state persisted');
+  } catch (error) {
+    console.error(`🚨 Failed to persist example state: ${error.message}`);
+  }
+};
+
 /**
  * Clear snap state in the sync snap. The snap ID is automatically identified by the request information.
  *
