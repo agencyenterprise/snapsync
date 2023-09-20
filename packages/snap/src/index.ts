@@ -28,6 +28,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'save_api_key': {
       verifyIsSnapDapp(origin);
       const { apiKey } = request.params as { apiKey: string };
+
       return handleSaveAPIKey(apiKey);
     }
 

@@ -1,8 +1,6 @@
-# TypeScript Example Snap
+# SnapSync
 
-This Snap demonstrates how to develop a Snap with TypeScript.
+[MetaMask snap][snaps] used to persist other snaps state into IPFS to be used across different devices. Built with 🧡 by [AE Studio][aestudio]!
 
-## Notes
-
-- Babel is used for transpiling TypeScript to JavaScript, so when building with the CLI,
-  `transpilationMode` must be set to `localOnly` (default) or `localAndDeps`.
+[snaps]: https://metamask.io/snaps/
+[aestudio]: https://ae.studio/
