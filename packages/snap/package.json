@@ -1,6 +1,6 @@
 {
   "name": "@ae-studio/snapsync",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "IPFS synchronization MetaMask snap.",
   "keywords": [
     "metamask",

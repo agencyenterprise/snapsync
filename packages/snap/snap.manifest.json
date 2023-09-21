@@ -1,5 +1,5 @@
 {
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Keep data synced between devices.",
   "proposedName": "SnapSync",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/agencyenterprise/snapsync"
   },
   "source": {
-    "shasum": "GQ5JBbG6kZKr5LDBcdlGzKF4uteQ5ORuCUSfHwYyigM=",
+    "shasum": "H3tWY9JLApngbSp3pvJRh6CSMeYku0hj1VEIpaOFr3Q=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
