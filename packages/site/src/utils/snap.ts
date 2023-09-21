@@ -1,5 +1,5 @@
 import { defaultSnapOrigin } from '../config';
-import { GetSnapsResponse, Snap } from '../types';
+import { GetSnapsResponse, Snap, ApiKeys } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -71,16 +71,16 @@ export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
  * @param syncSnapId - The ID of the sync snap.
  * @returns Saved API key content.
  */
-export const getAPIKey = async (syncSnapId: string) => {
+export const getAPIKeys = async (syncSnapId: string) => {
   const response = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: syncSnapId,
-      request: { method: 'get_api_key' },
+      request: { method: 'get_api_keys' },
     },
   });
 
-  return response as { apiKey: string };
+  return response as ApiKeys;
 };
 
 /**
@@ -97,7 +97,10 @@ export const saveAPIKey = async (
     method: 'wallet_invokeSnap',
     params: {
       snapId: syncSnapId,
-      request: { method: 'save_api_key', params: { apiKey } },
+      request: {
+        method: 'save_api_key',
+        params: { apiKey },
+      },
     },
   });
 };
@@ -136,6 +139,19 @@ export const persistState = async (
   });
 };
 
+export const persistExampleState = async () => {
+  try {
+    console.log('⌛ Persisting example state');
+    await persistState(defaultSnapOrigin, {
+      message: 'Hello from the sync snap!',
+      timestamp: Date.now(),
+    });
+    console.log('✅ Example state persisted');
+  } catch (error) {
+    console.error(`🚨 Failed to persist example state: ${error.message}`);
+  }
+};
+
 /**
  * Clear snap state in the sync snap. The snap ID is automatically identified by the request information.
  *
@@ -147,6 +163,16 @@ export const clearState = async (syncSnapId: string) => {
     params: {
       snapId: syncSnapId,
       request: { method: 'clear' },
+    },
+  });
+};
+
+export const showSnapDialog = async (snapId: string) => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId,
+      request: { method: 'dialog_api_key' },
     },
   });
 };

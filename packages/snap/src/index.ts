@@ -1,7 +1,7 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 
+import { heading, panel, text } from '@metamask/snaps-ui';
 import { getState, saveState } from './storage/local';
-import { stringToHex } from './utils/string';
 import { PinataIPFSService } from './ipfs/service';
 import { isSnapDapp } from './utils/snap';
 
@@ -20,13 +20,24 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
 }) => {
   switch (request.method) {
-    case 'get_api_key':
+    case 'get_api_keys': {
       verifyIsSnapDapp(origin);
-      return handleGetAPIKey();
+      return handleGetAPIKeys();
+    }
 
-    case 'save_api_key':
+    case 'save_api_key': {
       verifyIsSnapDapp(origin);
-      return handleSaveAPIKey((request.params as { apiKey: string }).apiKey);
+      const { apiKey } = request.params as { apiKey: string };
+
+      return handleSaveAPIKey(apiKey);
+    }
+
+    case 'has_api_key': {
+      return Boolean((await getState()).apiKeys?.pinata);
+    }
+
+    case 'dialog_api_key':
+      return dialogSaveAPIKey();
 
     case 'get':
       return handleGet(origin);
@@ -54,23 +65,47 @@ function verifyIsSnapDapp(origin: string): void {
 }
 
 /**
- * Returns the pinata key from managed state.
+ * Returns all the API keys from managed state.
  *
- * @returns found key or empty if not found.
+ * @returns found keys or empty if not found.
  */
-async function handleGetAPIKey(): Promise<{ apiKey: string }> {
+async function handleGetAPIKeys(): Promise<Record<string, string>> {
   const state = await getState();
-  return { apiKey: state?.apiKey || '' };
+  return state.apiKeys || {};
 }
 
 /**
- * Save the pinata key to managed state.
+ * Save the provider key to managed state.
  *
- * @param apiKey - The pinata key to save.
+ * @param apiKey - The key to save.
  */
 async function handleSaveAPIKey(apiKey: string): Promise<void> {
   const state = await getState();
-  await saveState({ ...state, apiKey });
+  const apiKeys = { ...state.apiKeys, pinata: apiKey };
+
+  await saveState({ apiKeys });
+}
+
+/**
+ * Prompt the user to save the pinata key.
+ */
+async function dialogSaveAPIKey(): Promise<void> {
+  const ipfsKey = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: panel([
+        heading('Enter your Piñata JWT token'),
+        text('Enter your key below:'),
+      ]),
+    },
+  });
+
+  if (ipfsKey && typeof ipfsKey === 'string') {
+    return await handleSaveAPIKey(ipfsKey.trim());
+  }
+
+  throw new Error('No input provided.');
 }
 
 /**
@@ -79,8 +114,7 @@ async function handleSaveAPIKey(apiKey: string): Promise<void> {
  * @param snapId - The snap ID.
  */
 async function handleGet(snapId: string): Promise<unknown> {
-  const encodedId = stringToHex(snapId);
-  return await PinataIPFSService.instance.get(encodedId);
+  return await PinataIPFSService.instance.get(snapId);
 }
 
 /**
@@ -90,8 +124,7 @@ async function handleGet(snapId: string): Promise<unknown> {
  * @param snapState - The snap state.
  */
 async function handleSave(snapId: string, snapState: unknown): Promise<void> {
-  const encodedId = stringToHex(snapId);
-  await PinataIPFSService.instance.set(encodedId, snapState);
+  await PinataIPFSService.instance.set(snapId, snapState);
 }
 
 /**
@@ -100,6 +133,5 @@ async function handleSave(snapId: string, snapState: unknown): Promise<void> {
  * @param snapId - The snap ID.
  */
 async function handleClear(snapId: string): Promise<void> {
-  const encodedId = stringToHex(snapId);
-  await PinataIPFSService.instance.delete(encodedId);
+  await PinataIPFSService.instance.delete(snapId);
 }

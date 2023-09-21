@@ -1,24 +1,25 @@
 {
-  "version": "0.1.9",
+  "version": "0.2.3",
   "description": "Keep data synced between devices.",
-  "proposedName": "IPFS Sync",
+  "proposedName": "SnapSync",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/agencyenterprise/snapsync"
   },
   "source": {
-    "shasum": "I/AIjboAAN3mv003yRnfPaew9CXP7FeMvytpKArN4as=",
+    "shasum": "GQ5JBbG6kZKr5LDBcdlGzKF4uteQ5ORuCUSfHwYyigM=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "metamask-ipfs-sync-snap",
+        "packageName": "@ae-studio/snapsync",
         "registry": "https://registry.npmjs.org/"
       }
     }
   },
   "initialPermissions": {
     "snap_manageState": {},
+    "snap_dialog": {},
     "endowment:network-access": {},
     "endowment:rpc": {
       "snaps": true,

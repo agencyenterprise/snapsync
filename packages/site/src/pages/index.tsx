@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -14,12 +14,10 @@ import {
 import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext, MetamaskActions } from '../hooks';
 import {
-  clearState,
   connectSnap,
-  getAPIKey,
-  getPersistedState,
+  getAPIKeys,
   getSnap,
-  persistState,
+  persistExampleState,
   saveAPIKey,
   shouldDisplayReconnectButton,
 } from '../utils';
@@ -81,42 +79,30 @@ const ErrorMessage = styled.div`
   }
 `;
 
+export const Head = () => <title>SnapSync</title>;
+
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-  const [apiKey, setApiKey] = useState('');
 
   // Load saved API key if connected
   useEffect(() => {
     if (state.installedSnap) {
-      getAPIKey(state.installedSnap.id)
-        .then((r) => setApiKey(r.apiKey))
+      getAPIKeys(state.installedSnap.id)
+        .then((apiKeys) => {
+          if (apiKeys?.pinata) {
+            const input = document.getElementById(
+              'pinata-key',
+            ) as HTMLInputElement;
+            input?.setAttribute('value', apiKeys.pinata);
+            persistExampleState();
+          }
+        })
         .catch((e) => {
           console.error(e);
           dispatch({ type: MetamaskActions.SetError, payload: e });
         });
     }
   }, [state.installedSnap]);
-
-  useEffect(() => {
-    function handleError(e: any) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-
-    if (state.installedSnap && apiKey) {
-      // clearState(state.installedSnap.id)
-      //   .then(() => console.log('Clean! 🧹'))
-      //   .catch(handleError);
-      // getPersistedState(state.installedSnap.id)
-      //   .then((r) => console.log(r))
-      //   .catch(handleError);
-      persistState(state.installedSnap.id, {
-        timestamp: new Date().toISOString(),
-      })
-        .then(() => console.log('Success! 🚀'))
-        .catch(handleError);
-    }
-  }, [state.installedSnap, apiKey]);
 
   const handleConnectClick = async () => {
     try {
@@ -135,10 +121,14 @@ const Index = () => {
 
   // Update UI when API key changes and save it in the snap
   const handleKeyChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setApiKey(e.target.value);
     if (state.installedSnap) {
       try {
-        await saveAPIKey(state.installedSnap.id, e.target.value);
+        const key = e.target.value;
+        await saveAPIKey(state.installedSnap.id, key);
+
+        if (key.length) {
+          await persistExampleState();
+        }
       } catch (e) {
         console.error(e);
         dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -205,15 +195,15 @@ const Index = () => {
         )}
 
         <CardWrapper disabled={!state.installedSnap}>
-          <CardTitle>Add your Piñata Key</CardTitle>
+          <CardTitle>Add your Piñata JWT</CardTitle>
           <CardDescription>
-            The snap needs an API key to connect to your Piñata account and save
-            your data.
+            Enter a Piñata JWT to connect to your Piñata account and save your
+            data.
           </CardDescription>
           <Input
+            id="pinata-key"
             type="password"
-            placeholder="Your Piñata key"
-            value={apiKey}
+            placeholder="Piñata JWT"
             onChange={handleKeyChanged}
           />
         </CardWrapper>

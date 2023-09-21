@@ -1,4 +1,5 @@
 export const config = {
-  url: 'https://api.pinata.cloud',
-  gatewayUrl: 'https://gateway.pinata.cloud',
+  pinataUrl: 'https://api.pinata.cloud',
+  pinataGatewayUrl: 'https://gateway.pinata.cloud',
+  infuraUrl: 'https://ipfs.infura.io:5001',
 };
