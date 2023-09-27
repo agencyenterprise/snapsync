@@ -7,7 +7,6 @@ import {
   CardTitle,
   CardWrapper,
   ConnectButton,
-  InstallFlaskButton,
   ReconnectButton,
   Input,
 } from '../components';
@@ -27,7 +26,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   flex: 1;
-  margin-top: 7.6rem;
+  margin-top: 3.6rem;
   margin-bottom: 3.6rem;
   ${({ theme }) => theme.mediaQueries.small} {
     padding-left: 2.4rem;
@@ -50,16 +49,17 @@ const Container = styled.div`
 `;
 
 const Heading = styled.h1`
-  margin-top: 0;
-  margin-bottom: 2.4rem;
   text-align: center;
+  font-size: 3.6rem;
+  margin-bottom: 2.4rem;
 `;
 
-const SubHeading = styled.h2`
-  margin-top: 0;
-  margin-bottom: 2.4rem;
+const SubTitle = styled.span`
   text-align: center;
-  font-size: 2.7em;
+  font-size: 1.75rem;
+  max-width: 80rem;
+  margin-bottom: 2.4rem;
+  color: ${(props) => props.theme.colors.text.muted};
 `;
 
 const Span = styled.span`
@@ -71,7 +71,7 @@ const CardContainer = styled.div`
   grid-template-columns: repeat(2, 1fr);
   flex-direction: column;
   flex-wrap: wrap;
-  max-width: 80rem;
+  max-width: 100rem;
   gap: 2.4rem;
   justify-content: space-between;
   width: 100%;
@@ -94,6 +94,15 @@ const ErrorMessage = styled.div`
     margin-bottom: 1.2rem;
     margin-top: 1.2rem;
     max-width: 100%;
+  }
+`;
+
+const Anchor = styled.a`
+  color: ${({ theme }) => theme.colors.primary.default};
+  text-decoration: none;
+  font-weight: 500;
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -157,36 +166,23 @@ const Index = () => {
   return (
     <>
       <Container>
-        <Heading>Sync Metamask Snaps Across Devices</Heading>
-        <p>
-          SnapSync is a
-          <Span>
-            {' '}
-            <a href="https://metamask.io/snaps/" target="_blank">
-              Metamask Snap
-            </a>
-          </Span>{' '}
+        <Heading>
+          Sync your <Span>MetaMask</Span> snaps!
+        </Heading>
+        <SubTitle>
+          SnapSync is a{' '}
+          <Anchor href="https://metamask.io/snaps" target="_blank">
+            MetaMask Snap
+          </Anchor>{' '}
           that saves data from snaps across devices securely using IPFS. Get
-          started by installing the Snap in Metamask Flask and entering your
-          Pinata JWT. Your JWT is stored locally and never leaves your device.
-        </p>
+          started by installing the snap and setting your Piñata JWT.
+        </SubTitle>
+
         <CardContainer>
           {state.error && (
             <ErrorMessage>
               <b>An error happened:</b> {state.error.message}
             </ErrorMessage>
-          )}
-
-          {!state.isFlask && (
-            <Card
-              content={{
-                title: 'Install',
-                description:
-                  'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
-                button: <InstallFlaskButton />,
-              }}
-              fullWidth
-            />
           )}
 
           {!state.installedSnap && (
@@ -237,7 +233,7 @@ const Index = () => {
           </CardWrapper>
         </CardContainer>
       </Container>
-      <Container>
+      {/* <Container>
         <SubHeading>Integrate SnapSync into your Snaps</SubHeading>
         <p>
           Snap developers can integrate SnapSync into their snaps to enable data
@@ -278,7 +274,7 @@ const Index = () => {
           If SnapSync is not installed, the user will be prompted to install and
           configure it via a Snap modal.
         </p>
-      </Container>
+      </Container> */}
     </>
   );
 };
