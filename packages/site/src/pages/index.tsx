@@ -28,7 +28,7 @@ const Container = styled.div`
   align-items: center;
   flex: 1;
   margin-top: 7.6rem;
-  margin-bottom: 7.6rem;
+  margin-bottom: 3.6rem;
   ${({ theme }) => theme.mediaQueries.small} {
     padding-left: 2.4rem;
     padding-right: 2.4rem;
@@ -36,12 +36,30 @@ const Container = styled.div`
     margin-bottom: 2rem;
     width: auto;
   }
+  p {
+    font-size: 1.6rem;
+    line-height: 2.4rem;
+    max-width: 80rem;
+    text-align: left;
+  }
+  code {
+    font-size: 1.6rem;
+    line-height: 4.4rem;
+    max-width: 80rem;
+  }
 `;
 
 const Heading = styled.h1`
   margin-top: 0;
   margin-bottom: 2.4rem;
   text-align: center;
+`;
+
+const SubHeading = styled.h2`
+  margin-top: 0;
+  margin-bottom: 2.4rem;
+  text-align: center;
+  font-size: 2.7em;
 `;
 
 const Span = styled.span`
@@ -137,78 +155,131 @@ const Index = () => {
   };
 
   return (
-    <Container>
-      <Heading>
-        Set up your <Span>IPFS</Span> connection
-      </Heading>
+    <>
+      <Container>
+        <Heading>Sync Metamask Snaps Across Devices</Heading>
+        <p>
+          SnapSync is a
+          <Span>
+            {' '}
+            <a href="https://metamask.io/snaps/" target="_blank">
+              Metamask Snap
+            </a>
+          </Span>{' '}
+          that saves data from snaps across devices securely using IPFS. Get
+          started by installing the Snap in Metamask Flask and entering your
+          Pinata JWT. Your JWT is stored locally and never leaves your device.
+        </p>
+        <CardContainer>
+          {state.error && (
+            <ErrorMessage>
+              <b>An error happened:</b> {state.error.message}
+            </ErrorMessage>
+          )}
 
-      <CardContainer>
-        {state.error && (
-          <ErrorMessage>
-            <b>An error happened:</b> {state.error.message}
-          </ErrorMessage>
-        )}
+          {!state.isFlask && (
+            <Card
+              content={{
+                title: 'Install',
+                description:
+                  'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
+                button: <InstallFlaskButton />,
+              }}
+              fullWidth
+            />
+          )}
 
-        {!state.isFlask && (
-          <Card
-            content={{
-              title: 'Install',
-              description:
-                'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
-              button: <InstallFlaskButton />,
-            }}
-            fullWidth
-          />
-        )}
+          {!state.installedSnap && (
+            <Card
+              content={{
+                title: 'Connect',
+                description: 'Get started by connecting MetaMask to the snap.',
+                button: (
+                  <ConnectButton
+                    onClick={handleConnectClick}
+                    disabled={!state.isFlask}
+                  />
+                ),
+              }}
+              disabled={!state.isFlask}
+            />
+          )}
 
-        {!state.installedSnap && (
-          <Card
-            content={{
-              title: 'Connect',
-              description: 'Get started by connecting MetaMask to the snap.',
-              button: (
-                <ConnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.isFlask}
-                />
-              ),
-            }}
-            disabled={!state.isFlask}
-          />
-        )}
+          {shouldDisplayReconnectButton(state.installedSnap) && (
+            <Card
+              content={{
+                title: 'Reconnect',
+                description:
+                  'Reconnect to the snap to update to the latest version.',
+                button: (
+                  <ReconnectButton
+                    onClick={handleConnectClick}
+                    disabled={!state.installedSnap}
+                  />
+                ),
+              }}
+              disabled={!state.installedSnap}
+            />
+          )}
 
-        {shouldDisplayReconnectButton(state.installedSnap) && (
-          <Card
-            content={{
-              title: 'Reconnect',
-              description:
-                'Reconnect to the snap to update to the latest version.',
-              button: (
-                <ReconnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-          />
-        )}
-
-        <CardWrapper disabled={!state.installedSnap}>
-          <CardTitle>Add your Piñata JWT</CardTitle>
-          <CardDescription>
-            Enter a Piñata JWT to connect to your Piñata account and save your
-            data.
-          </CardDescription>
-          <Input
-            id="pinata-key"
-            type="password"
-            placeholder="Piñata JWT"
-            onChange={handleKeyChanged}
-          />
-        </CardWrapper>
-      </CardContainer>
-    </Container>
+          <CardWrapper disabled={!state.installedSnap}>
+            <CardTitle>Add your Piñata JWT</CardTitle>
+            <CardDescription>
+              Enter a Piñata JWT to connect to your Piñata account and save your
+              data.
+            </CardDescription>
+            <Input
+              id="pinata-key"
+              type="password"
+              placeholder="Piñata JWT"
+              onChange={handleKeyChanged}
+            />
+          </CardWrapper>
+        </CardContainer>
+      </Container>
+      <Container>
+        <SubHeading>Integrate SnapSync into your Snaps</SubHeading>
+        <p>
+          Snap developers can integrate SnapSync into their snaps to enable data
+          persistence on IPFS.
+        </p>
+        <p>Getting started is easy:</p>
+        <p>Include the SnapSync Snap in your Snap: </p>
+        <p>
+          <code>const IPFS_SNAP_ID = 'npm:@ae-studio/snapsync';</code>
+        </p>
+        <p>Call SnapSync methods to get and set data on IPFS: </p>
+        <p>
+          <code>
+            {`await snap.request({
+            method: 'wallet_invokeSnap',
+            params: {
+              snapId: IPFS_SNAP_ID,
+            request: {method: 'get' },
+      },
+    });`}
+          </code>
+        </p>
+        <p>
+          <code>
+            {`await snap.request({
+                method: 'wallet_invokeSnap',
+              params: {
+                snapId: IPFS_SNAP_ID,
+              request: {
+                method: 'set',
+              params: state,
+          },
+        },
+      });`}
+          </code>
+        </p>
+        <p>
+          If SnapSync is not installed, the user will be prompted to install and
+          configure it via a Snap modal.
+        </p>
+      </Container>
+    </>
   );
 };
 
