@@ -144,14 +144,6 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
-  code {
-    background-color: ${(props) => props.theme.colors.background.alternative};
-    font-family: ${(props) => props.theme.fonts.code};
-    padding: 1.2rem;
-    font-weight: normal;
-    font-size: ${(props) => props.theme.fontSizes.text};
-  }
-
   button {
     font-size: ${(props) => props.theme.fontSizes.small};
     border-radius: ${(props) => props.theme.radii.button};

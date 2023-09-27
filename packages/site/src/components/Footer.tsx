@@ -21,7 +21,6 @@ const PoweredByButton = styled.a`
   justify-content: center;
   padding: 1.2rem;
   border-radius: ${({ theme }) => theme.radii.button};
-  border: 0.5px solid ${({ theme }) => theme.colors.border.default};
   background-color: ${({ theme }) => theme.colors.background.alternative};
 `;
 
