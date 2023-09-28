@@ -56,7 +56,10 @@ export const Header = () => {
 
       <RightContainer>
         Made with 💜 by{' '}
-        <Anchor href="https://ae.studio/" target="_">
+        <Anchor
+          href="https://ae.studio/blockchain?utm_source=snapsync&utm_campaign=snapsync-website&utm_medium=poc&utm_term=9569ec30-dd99-4fb7-9104-df4cf13d9983"
+          target="_"
+        >
           AE Studio
         </Anchor>
       </RightContainer>
