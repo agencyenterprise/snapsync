@@ -20,9 +20,8 @@ export const CardWrapper = styled.div<{
   grid-column: ${({ fullWidth }) => (fullWidth ? 'span 2 / span 2' : 'auto')};
   background-color: ${({ theme }) => theme.colors.card.default};
   padding: 2rem;
-  border: 1px solid ${({ theme }) => theme.colors.border.default};
+  border: 0.5px solid ${({ theme }) => theme.colors.border.default};
   border-radius: ${({ theme }) => theme.radii.default};
-  box-shadow: ${({ theme }) => theme.shadows.default};
   filter: opacity(${({ disabled }) => (disabled ? '.4' : '1')});
   align-self: stretch;
   ${({ theme }) => theme.mediaQueries.small} {

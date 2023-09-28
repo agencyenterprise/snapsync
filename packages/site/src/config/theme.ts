@@ -41,7 +41,7 @@ const theme = {
 export const light: DefaultTheme = {
   colors: {
     background: {
-      default: '#FFFFFF',
+      default: '#FAFAFA',
       alternative: '#F2F4F6',
       inverse: '#141618',
     },
@@ -142,14 +142,6 @@ export const GlobalStyle = createGlobalStyle`
     ${(props) => props.theme.mediaQueries.small} {
       font-size: ${(props) => props.theme.fontSizes.mobileHeading};
     }
-  }
-
-  code {
-    background-color: ${(props) => props.theme.colors.background.alternative};
-    font-family: ${(props) => props.theme.fonts.code};
-    padding: 1.2rem;
-    font-weight: normal;
-    font-size: ${(props) => props.theme.fontSizes.text};
   }
 
   button {

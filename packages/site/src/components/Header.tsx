@@ -1,7 +1,6 @@
 import styled, { useTheme } from 'styled-components';
-import { getThemePreference } from '../utils';
+
 import { SnapLogo } from './SnapLogo';
-import { Toggle } from './Toggle';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -9,7 +8,8 @@ const HeaderWrapper = styled.header`
   justify-content: space-between;
   align-items: center;
   padding: 2.4rem;
-  border-bottom: 1px solid ${(props) => props.theme.colors.border.default};
+  border-bottom: 0.5px solid ${(props) => props.theme.colors.border.default};
+  background-color: #fff;
 `;
 
 const Title = styled.p`
@@ -34,11 +34,17 @@ const RightContainer = styled.div`
   align-items: center;
 `;
 
-export const Header = ({
-  handleToggleClick,
-}: {
-  handleToggleClick(): void;
-}) => {
+const Anchor = styled.a`
+  color: ${({ theme }) => theme.colors.primary.default};
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 0.4rem;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+export const Header = () => {
   const theme = useTheme();
 
   return (
@@ -47,11 +53,12 @@ export const Header = ({
         <SnapLogo color={theme.colors.icon.default} size={36} />
         <Title>SnapSync</Title>
       </LogoWrapper>
+
       <RightContainer>
-        <Toggle
-          onToggle={handleToggleClick}
-          defaultChecked={getThemePreference()}
-        />
+        Made with 💜 by{' '}
+        <Anchor href="https://ae.studio/" target="_">
+          AE Studio
+        </Anchor>
       </RightContainer>
     </HeaderWrapper>
   );

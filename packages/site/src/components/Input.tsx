@@ -6,10 +6,14 @@ export const Input = styled.input`
   font-family: ${(props) => props.theme.fonts.default};
   font-size: ${(props) => props.theme.fontSizes.small};
   border-radius: ${(props) => props.theme.radii.button};
-  border: 1px solid ${(props) => props.theme.colors.border.default};
+  border: 0.5px solid ${(props) => props.theme.colors.border.default};
   min-height: 4rem;
   padding: 0 1rem;
   ${({ theme }) => theme.mediaQueries.small} {
     width: 100%;
+  }
+
+  &:focus {
+    outline-color: ${(props) => props.theme.colors.primary.default};
   }
 `;
